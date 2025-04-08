@@ -1,5 +1,5 @@
-import 'package:autosched/admin/screens/teaching_load_screen/teaching_load.dart';
 import 'package:autosched/screens/teaching_load_screen/create_teaching/teaching_load_controller.dart';
+import 'package:autosched/screens/teaching_load_screen/view_teaching_load.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -396,7 +396,7 @@ class _CreateTeachingLoadScreenState extends State<CreateTeachingLoadScreen> {
       year4: sections['4th Year']!,
     );
     if (_controller.isSuccess == true) {
-      Get.off(() => TeachingLoadScreen());
+      Get.off(() => ViewTeachingLoadScreen());
     }
   }
 }
