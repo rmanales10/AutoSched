@@ -82,7 +82,7 @@ class _RoomScreenState extends State<RoomScreen> {
                       int index = entry.key + 1;
                       Map<String, dynamic> room = entry.value;
                       return _buildRow([
-                        room['room_id'].toString() ?? '',
+                        room['room_id'].toString(),
                         room['room_number'] ?? '',
                         room['room_name'] ?? '',
                         room['room_type'] ?? '',

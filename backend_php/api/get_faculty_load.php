@@ -7,7 +7,7 @@ header("Content-Type: application/json");
 require(__DIR__ . '/../config/db.php');
 
 try {
-    $stmt = $conn->prepare("SELECT `subject_code`, `descriptive_title`, `lec`, `lab`, `faculty`, `section` FROM `auto_sched`.`faculty_load`");
+    $stmt = $conn->prepare("SELECT * FROM `auto_sched`.`faculty_load`");
     $stmt->execute();
     $faculty_load = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -16,7 +16,7 @@ try {
             "status" => "success",
             "data" => $faculty_load
         ]);
-    } else {    
+    } else {
         echo json_encode([
             "status" => "error",
             "message" => "No faculty load found"

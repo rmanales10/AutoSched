@@ -13,42 +13,17 @@ class AssignFacultyLoadScreen extends StatefulWidget {
 
 class _AssignFacultyLoadScreenState extends State<AssignFacultyLoadScreen> {
   final _controller = Get.put(FacultyLoadController());
-  String selectedItem = "Teaching Load"; // Sidebar selected item
-
-  final List<List<String>> facultyLoadData = [
-    [
-      "SUBJECT CODE",
-      "DESCRIPTIVE TITLE",
-      "LEC",
-      "LAB",
-      "CREDIT",
-      "FACULTY",
-      "SECTION",
-    ],
-    ["IT111", "Introduction to Computing", "2", "1", "3", "", ""],
-    ["IT112", "Computer Programming 1", "2", "1", "3", "", ""],
-    ["PurCom", "Purposive Communication", "2", "1", "3", "", ""],
-    ["IT113", "Computer Programming 2", "2", "1", "3", "", ""],
-    ["IT114", "Data Structures & Algorithms", "2", "1", "3", "", ""],
-    ["IT115", "Operating Systems", "2", "1", "3", "", ""],
-    ["IT116", "Computer Networks", "2", "1", "3", "", ""],
-    ["IT113", "Computer Programming 2", "2", "1", "3", "", ""],
-    ["IT114", "Data Structures & Algorithms", "2", "1", "3", "", ""],
-    ["IT115", "Operating Systems", "2", "1", "3", "", ""],
-    ["IT116", "Computer Networks", "2", "1", "3", "", ""],
-  ];
-  @override
-  void initState() {
-    _controller.fetchLoad();
-    _controller.fetchFaculty();
-    super.initState();
-  }
-
-  // final List<String> facultyList = ["Prof. Smith", "Dr. Johnson", "Ms. Davis"];
-  final List<String> sectionList = ["Section A", "Section B", "Section C"];
+  String selectedItem = "Teaching Load";
 
   Map<int, String> selectedFaculty = {};
   Map<int, String> selectedSection = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.fetchLoad();
+    _controller.fetchFaculty();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,67 +63,9 @@ class _AssignFacultyLoadScreenState extends State<AssignFacultyLoadScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
-                  // Fixed Header Row
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 14,
-                      horizontal: 16,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white, // Header background color
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: _rowText(facultyLoadData[0][0], true),
-                        ),
-                        Expanded(
-                          flex: 3,
-                          child: _rowText(facultyLoadData[0][1], true),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: _rowText(facultyLoadData[0][2], true),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: _rowText(facultyLoadData[0][3], true),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: _rowText(facultyLoadData[0][4], true),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: _rowText(facultyLoadData[0][5], true),
-                        ),
-                        const SizedBox(width: 30),
-                        Expanded(
-                          flex: 2,
-                          child: _rowText(facultyLoadData[0][6], true),
-                        ),
-                      ],
-                    ),
-                  ),
-
+                  _buildHeaderRow(),
                   const SizedBox(height: 5),
-
-                  // Scrollable Table Content
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: List.generate(
-                          facultyLoadData.length - 1,
-                          (index) =>
-                              _buildRow(facultyLoadData[index + 1], index + 1),
-                        ),
-                      ),
-                    ),
-                  ),
-
+                  _buildTableContent(),
                   const SizedBox(height: 20),
                   _buildBottomSection(),
                 ],
@@ -160,9 +77,105 @@ class _AssignFacultyLoadScreenState extends State<AssignFacultyLoadScreen> {
     );
   }
 
-  Widget _buildRow(List<String> values, int index) {
-    bool isHeader = index == 0;
+  Widget _buildHeaderRow() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Obx(
+        () => Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: _rowText(
+                _controller.loadData.isNotEmpty
+                    ? _controller.loadData[0][0]
+                    : '',
+                true,
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: _rowText(
+                _controller.loadData.isNotEmpty
+                    ? _controller.loadData[0][1]
+                    : '',
+                true,
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: _rowText(
+                _controller.loadData.isNotEmpty
+                    ? _controller.loadData[0][2]
+                    : '',
+                true,
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: _rowText(
+                _controller.loadData.isNotEmpty
+                    ? _controller.loadData[0][3]
+                    : '',
+                true,
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: _rowText(
+                _controller.loadData.isNotEmpty
+                    ? _controller.loadData[0][4]
+                    : '',
+                true,
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: _rowText(
+                _controller.loadData.isNotEmpty
+                    ? _controller.loadData[0][5]
+                    : '',
+                true,
+              ),
+            ),
+            const SizedBox(width: 30),
+            Expanded(
+              flex: 2,
+              child: _rowText(
+                _controller.loadData.isNotEmpty
+                    ? _controller.loadData[0][6]
+                    : '',
+                true,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
+  Widget _buildTableContent() {
+    return Expanded(
+      child: SingleChildScrollView(
+        child: Obx(() {
+          if (_controller.loadData.isEmpty || _controller.loadData.length < 2) {
+            return Center(child: Text('No data available'));
+          }
+          return Column(
+            children: List.generate(
+              _controller.loadData.length - 1,
+              (index) => _buildRow(_controller.loadData[index + 1], index + 1),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _buildRow(List<String> values, int index) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
       decoration: BoxDecoration(
@@ -171,29 +184,14 @@ class _AssignFacultyLoadScreenState extends State<AssignFacultyLoadScreen> {
       ),
       child: Row(
         children: [
-          Expanded(
-            flex: 2,
-            child: _rowText(values[0], isHeader),
-          ), // Subject Code
-          Expanded(flex: 3, child: _rowText(values[1], isHeader)), // Title
-          Expanded(flex: 1, child: _rowText(values[2], isHeader)), // LEC
-          Expanded(flex: 1, child: _rowText(values[3], isHeader)), // LAB
-          Expanded(flex: 1, child: _rowText(values[4], isHeader)), // CREDIT
-          Expanded(
-            flex: 2,
-            child:
-                isHeader
-                    ? _rowText(values[5], isHeader)
-                    : _facultyDropdown(index),
-          ),
+          Expanded(flex: 2, child: _rowText(values[0], false)),
+          Expanded(flex: 3, child: _rowText(values[1], false)),
+          Expanded(flex: 1, child: _rowText(values[2], false)),
+          Expanded(flex: 1, child: _rowText(values[3], false)),
+          Expanded(flex: 1, child: _rowText(values[4], false)),
+          Expanded(flex: 2, child: _facultyDropdown(index)),
           const SizedBox(width: 30),
-          Expanded(
-            flex: 2,
-            child:
-                isHeader
-                    ? _rowText(values[6], isHeader)
-                    : _sectionDropdown(index),
-          ),
+          Expanded(flex: 2, child: _sectionDropdown(index)),
         ],
       ),
     );
@@ -211,25 +209,61 @@ class _AssignFacultyLoadScreenState extends State<AssignFacultyLoadScreen> {
   }
 
   Widget _facultyDropdown(int index) {
-    return _dropdownWidget(
-      index: index,
-      hint: "Choose Faculty",
-      value: selectedFaculty[index],
-      items: _controller.facultyList,
-      onChanged:
-          (newValue) => setState(() => selectedFaculty[index] = newValue!),
-    );
+    return Obx(() {
+      List<String> items =
+          _controller.facultyList.isNotEmpty
+              ? _controller.facultyList
+              : ['No faculty available'];
+      String? initialFaculty =
+          _controller.loadData.isNotEmpty && _controller.loadData.length > index
+              ? _controller.loadData[index][5]
+              : null;
+      String? displayValue =
+          initialFaculty?.isNotEmpty == true
+              ? initialFaculty
+              : selectedFaculty[index];
+
+      return _dropdownWidget(
+        index: index,
+        hint: "Choose Faculty",
+        value: displayValue,
+        items: items,
+        onChanged: (newValue) {
+          setState(() {
+            selectedFaculty[index] = newValue!;
+          });
+        },
+      );
+    });
   }
 
   Widget _sectionDropdown(int index) {
-    return _dropdownWidget(
-      index: index,
-      hint: "Choose Section",
-      value: selectedSection[index],
-      items: sectionList,
-      onChanged:
-          (newValue) => setState(() => selectedSection[index] = newValue!),
-    );
+    return Obx(() {
+      List<String> items =
+          _controller.sectionList.isNotEmpty
+              ? _controller.sectionList
+              : ['No sections available'];
+      String? initialSection =
+          _controller.loadData.isNotEmpty && _controller.loadData.length > index
+              ? _controller.loadData[index][6]
+              : null;
+      String? displayValue =
+          initialSection?.isNotEmpty == true
+              ? initialSection
+              : selectedSection[index];
+
+      return _dropdownWidget(
+        index: index,
+        hint: "Choose Section",
+        value: displayValue,
+        items: items,
+        onChanged: (newValue) {
+          setState(() {
+            selectedSection[index] = newValue!;
+          });
+        },
+      );
+    });
   }
 
   Widget _dropdownWidget({
@@ -239,6 +273,10 @@ class _AssignFacultyLoadScreenState extends State<AssignFacultyLoadScreen> {
     required List<String> items,
     required ValueChanged<String?> onChanged,
   }) {
+    if (value != null && !items.contains(value)) {
+      value = null;
+    }
+
     return Container(
       height: 40,
       padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -256,11 +294,11 @@ class _AssignFacultyLoadScreenState extends State<AssignFacultyLoadScreen> {
           ),
           onChanged: onChanged,
           items:
-              items.map((String value) {
+              items.map((String item) {
                 return DropdownMenuItem<String>(
-                  value: value,
+                  value: item,
                   child: Text(
-                    value,
+                    item,
                     style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
                   ),
                 );
@@ -369,8 +407,7 @@ class _AssignFacultyLoadScreenState extends State<AssignFacultyLoadScreen> {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
-              mainAxisSize:
-                  MainAxisSize.min, // Ensures it only takes needed space
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
@@ -383,8 +420,15 @@ class _AssignFacultyLoadScreenState extends State<AssignFacultyLoadScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: () {
+                      onTap: () async {
                         Navigator.of(context).pop();
+                        await _updateFacultyLoad();
+                        // You might want to show a success message or refresh the data here
+                        _controller.fetchLoad(); // Refresh the data
+                        Get.snackbar(
+                          'Success',
+                          'Faculty load updated successfully',
+                        );
                       },
                       child: Container(
                         width: 120,
@@ -393,8 +437,8 @@ class _AssignFacultyLoadScreenState extends State<AssignFacultyLoadScreen> {
                           color: const Color(0xFF010042),
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        child: Center(
-                          child: const Text(
+                        child: const Center(
+                          child: Text(
                             "Submit",
                             style: TextStyle(
                               color: Colors.white,
@@ -421,8 +465,8 @@ class _AssignFacultyLoadScreenState extends State<AssignFacultyLoadScreen> {
                             width: 1,
                           ),
                         ),
-                        child: Center(
-                          child: const Text(
+                        child: const Center(
+                          child: Text(
                             "No",
                             style: TextStyle(
                               color: Color(0xFF010042),
@@ -441,5 +485,17 @@ class _AssignFacultyLoadScreenState extends State<AssignFacultyLoadScreen> {
         );
       },
     );
+  }
+
+  Future<void> _updateFacultyLoad() async {
+    for (int i = 0; i < _controller.loadId.length; i++) {
+      String loadId = _controller.loadId[i][0];
+      String? faculty = selectedFaculty[i + 1];
+      String? section = selectedSection[i + 1];
+
+      if (faculty != null && section != null) {
+        await _controller.updateFacultyLoad(loadId, faculty, section);
+      }
+    }
   }
 }
