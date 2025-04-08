@@ -1,30 +1,36 @@
+import 'package:autosched/screens/setup_manager_screen/designation/designation_list/designation_list_controller.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class SubjectsListScreen extends StatefulWidget {
+class DesignationListScreen extends StatefulWidget {
   final String selectedItem;
   final Function(String, String) onItemSelected;
 
-  const SubjectsListScreen({
+  const DesignationListScreen({
     super.key,
     required this.selectedItem,
     required this.onItemSelected,
   });
 
   @override
-  _SubjectsListScreenState createState() => _SubjectsListScreenState();
+  _DesignationListScreenState createState() => _DesignationListScreenState();
 }
 
-class _SubjectsListScreenState extends State<SubjectsListScreen> {
+class _DesignationListScreenState extends State<DesignationListScreen> {
+  final DesignationListController controller = Get.put(
+    DesignationListController(),
+  );
   late String selectedItem;
 
-  final List<List<String>> subjectsData = [
-    ["ID", "SUBJECT CODE", "DESCRIPTIVE TITLE", "LEC", "LAB", "CREDIT", "ACTIONS"],
-    ["001", "IT321", "CAPSTONE PROJECT AND RESEARCH 1", "2.0", "1.0", "3.0", ""],
-    ["002", "IT112", "Computer Programming 1", "2.0", "1.0", "3.0", ""],
-    ["003", "CS101", "Introduction to Computer Science", "3.0", "0.0", "3.0", ""],
-    ["004", "MATH101", "College Algebra", "3.0", "0.0", "3.0", ""],
-    ["005", "ENG101", "English Composition", "3.0", "0.0", "3.0", ""],
+  final List<List<String>> designationData = [
+    ["ID", "DESIGNATION", "OFFICE/DEPARTMENT", "TIME RELEASE", "ACTIONS"],
+    ["001", "CHAIRPERSON", "IT DEPARTMENT", "9 UNITS", ""],
+    ["002", "REGISTRAR", "ADMIN OFFICE", "9 UNITS", ""],
+    ["003", "DEAN", "COLLEGE OF ENGINEERING", "12 UNITS", ""],
+    ["004", "PROGRAM COORDINATOR", "CS DEPARTMENT", "6 UNITS", ""],
+    ["005", "LIBRARIAN", "LIBRARY", "9 UNITS", ""],
+    ["006", "GUIDANCE COUNSELOR", "GUIDANCE OFFICE", "9 UNITS", ""],
   ];
 
   @override
@@ -54,7 +60,6 @@ class _SubjectsListScreenState extends State<SubjectsListScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header Section
                   Padding(
                     padding: const EdgeInsets.only(
                       top: 30,
@@ -65,7 +70,7 @@ class _SubjectsListScreenState extends State<SubjectsListScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          'SUBJECTS LIST',
+                          'DESIGNATION LIST',
                           style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
@@ -90,7 +95,7 @@ class _SubjectsListScreenState extends State<SubjectsListScreen> {
                                 size: 50,
                               ),
                               onPressed: () {
-                                Navigator.pushNamed(context, '/addsubject');
+                                Navigator.pushNamed(context, '/adddesignation');
                               },
                             ),
                             IconButton(
@@ -109,15 +114,42 @@ class _SubjectsListScreenState extends State<SubjectsListScreen> {
                     ),
                   ),
                   const SizedBox(height: 30),
-            
+
                   Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: List.generate(subjectsData.length, (index) {
-                          return _buildRow(subjectsData[index], index);
-                        }),
-                      ),
-                    ),
+                    child: Obx(() {
+                      if (controller.isLoading.value) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (controller.error.isNotEmpty) {
+                        return Center(child: Text(controller.error.value));
+                      } else {
+                        return SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              _buildRow([
+                                "ID",
+                                "DESIGNATION",
+                                "OFFICE/DEPARTMENT",
+                                "TIME RELEASE",
+                                "ACTIONS",
+                              ], 0),
+                              ...List.generate(controller.designations.length, (
+                                index,
+                              ) {
+                                final designation =
+                                    controller.designations[index];
+                                return _buildRow([
+                                  designation['id'].toString(),
+                                  designation['designation'],
+                                  designation['office_or_department'],
+                                  designation['time_release'],
+                                  "",
+                                ], index + 1);
+                              }),
+                            ],
+                          ),
+                        );
+                      }
+                    }),
                   ),
                 ],
               ),
@@ -136,22 +168,30 @@ class _SubjectsListScreenState extends State<SubjectsListScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
       decoration: BoxDecoration(
-        color: isHeader
-            ? Colors.white
-            : (isEvenRow ? Colors.white : Colors.transparent),
+        color:
+            isHeader
+                ? Colors.white
+                : (isEvenRow ? Colors.white : Colors.transparent),
         borderRadius: BorderRadius.circular(30),
       ),
       child: Row(
         children: [
           Expanded(flex: 1, child: _rowText(values[0], isHeader)), // ID
-          Expanded(flex: 2, child: _rowText(values[1], isHeader)), // Subject Code
-          Expanded(flex: 4, child: _rowText(values[2], isHeader)), // Descriptive Title
-          Expanded(flex: 1, child: _rowText(values[3], isHeader)), // LEC
-          Expanded(flex: 1, child: _rowText(values[4], isHeader)), // LAB
-          Expanded(flex: 1, child: _rowText(values[5], isHeader)), // CREDIT
+          Expanded(
+            flex: 3,
+            child: _rowText(values[1], isHeader),
+          ), // Designation
+          Expanded(
+            flex: 3,
+            child: _rowText(values[2], isHeader),
+          ), // Office/Department
           Expanded(
             flex: 2,
-            child: isHeader ? _rowText(values[6], isHeader) : _actionIcons(),
+            child: _rowText(values[3], isHeader),
+          ), // Time Release
+          Expanded(
+            flex: 2,
+            child: isHeader ? _rowText(values[4], isHeader) : _actionIcons(),
           ), // Actions
         ],
       ),
@@ -174,24 +214,20 @@ class _SubjectsListScreenState extends State<SubjectsListScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        // IconButton(
+        //   icon: const Icon(
+        //     Icons.content_paste_search_rounded,
+        //     color: Colors.green,
+        //     size: 40,
+        //   ),
+        //   onPressed: () {
+        //     Navigator.pushNamed(context, '/viewdesignation');
+        //   },
+        // ),
         IconButton(
-          icon: const Icon(
-            Icons.content_paste_search_rounded,
-            color: Colors.green,
-            size: 40,
-          ),
+          icon: const Icon(Icons.edit, color: Colors.green, size: 40),
           onPressed: () {
-            Navigator.pushNamed(context, '/viewsubject');
-          },
-        ),
-        IconButton(
-          icon: const Icon(
-            Icons.edit,
-            color: Colors.green,
-            size: 40,
-          ),
-          onPressed: () {
-            Navigator.pushNamed(context, '/editsubject');
+            Navigator.pushNamed(context, '/editdesignation');
           },
         ),
       ],

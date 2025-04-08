@@ -1,20 +1,25 @@
+import 'package:autosched/screens/setup_manager_screen/designation/add_designation/add_designation_controller.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class AddCampusScreen extends StatefulWidget {
-  const AddCampusScreen({super.key});
+class AddDesignationScreen extends StatefulWidget {
+  const AddDesignationScreen({super.key});
 
   @override
-  _AddCampusScreenState createState() => _AddCampusScreenState();
+  _AddDesignationScreenState createState() => _AddDesignationScreenState();
 }
 
-class _AddCampusScreenState extends State<AddCampusScreen> {
-  String? selectedCampusType;
+class _AddDesignationScreenState extends State<AddDesignationScreen> {
+  final _controller = Get.put(AddDesignationController());
+  final _designationController = TextEditingController();
+  final _officeOrDepartmentController = TextEditingController();
+  final _timeReleaseController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double inputFontSize = screenWidth < 600 ? 14 : 18;
+    double inputFontSize = screenWidth < 600 ? 14 : 23;
     double textFieldWidth = screenWidth > 1200 ? 380 : screenWidth * 0.3;
 
     return Scaffold(
@@ -22,7 +27,7 @@ class _AddCampusScreenState extends State<AddCampusScreen> {
       body: Row(
         children: [
           Sidebar(
-            selectedItem: "Campus",
+            selectedItem: "Designation",
             onItemSelected: (title, route) {
               Navigator.pushNamed(context, route);
             },
@@ -31,12 +36,12 @@ class _AddCampusScreenState extends State<AddCampusScreen> {
             child: SingleChildScrollView(
               child: Center(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 200),
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 60,
-                      vertical: 30,
+                      horizontal: 30,
+                      vertical: 60,
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -46,16 +51,15 @@ class _AddCampusScreenState extends State<AddCampusScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 20),
                         const Text(
-                          "Add Campus", // Changed from "Add Rooms" to "Add Campus"
+                          "Add Designation",
                           style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 50),
-                        _buildCampusForm(inputFontSize, textFieldWidth),
+                        _buildDesignationForm(inputFontSize, textFieldWidth),
                         const SizedBox(height: 70),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -89,16 +93,34 @@ class _AddCampusScreenState extends State<AddCampusScreen> {
     );
   }
 
-  Widget _buildCampusForm(double fontSize, double width) {
+  Widget _buildDesignationForm(double fontSize, double width) {
     return Column(
       children: [
         Wrap(
-          spacing: 50,
+          spacing: 30,
           runSpacing: 30,
           children: [
-            _buildTextField("Campus Name", fontSize, width),
-            _buildCampusTypeDropdown(fontSize, width),
-            _buildTextField("Address", fontSize, width),
+            _buildTextField(
+              "Input designation",
+              "Designation",
+              fontSize,
+              width,
+              _designationController,
+            ),
+            _buildTextField(
+              "Input office/department",
+              "Office/Department",
+              fontSize,
+              width,
+              _officeOrDepartmentController,
+            ),
+            _buildTextField(
+              "Input time release",
+              "Time Release",
+              fontSize,
+              width,
+              _timeReleaseController,
+            ),
           ],
         ),
       ],
@@ -134,82 +156,57 @@ class _AddCampusScreenState extends State<AddCampusScreen> {
     );
   }
 
-  Widget _buildCampusTypeDropdown(double fontSize, double width) {
+  Widget _buildTextField(
+    String hint,
+    String label,
+    double fontSize,
+    double width,
+    TextEditingController? controller,
+  ) {
     return SizedBox(
       width: width,
-      child: Container(
-        height: 50,
-        padding: const EdgeInsets.symmetric(horizontal: 15),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(width: 1, color: Colors.grey.shade300),
-        ),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            borderRadius: BorderRadius.circular(30),
-            hint: Text(
-              "Campus Type", // Changed from "Room Type" to "Campus Type"
-              style: TextStyle(fontSize: fontSize, color: Colors.grey.shade600),
-            ),
-            value: selectedCampusType,
-            icon: Icon(
-              Icons.arrow_drop_down_rounded,
-              color: Colors.grey.shade600,
-              size: 24,
-            ),
-            items:
-                ['Main Campus', 'Satellite Campus', 'Extension Campus']
-                    .map(
-                      (type) => DropdownMenuItem(
-                        value: type,
-                        child: Text(
-                          type,
-                          style: TextStyle(
-                            fontSize: fontSize,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                      ),
-                    )
-                    .toList(),
-            onChanged: (value) {
-              setState(() {
-                selectedCampusType = value;
-              });
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(String hint, double fontSize, double width) {
-    return SizedBox(
-      width: width,
-      child: Container(
-        height: 50,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(width: 1, color: Colors.grey.shade300),
-        ),
-        child: TextField(
-          cursorColor: Colors.grey.shade600,
-          style: TextStyle(fontSize: fontSize),
-          decoration: InputDecoration(
-            contentPadding: const EdgeInsets.symmetric(
-              vertical: 10,
-              horizontal: 20,
-            ),
-            border: InputBorder.none,
-            hintText: hint,
-            hintStyle: TextStyle(
-              fontSize: fontSize,
-              color: Colors.grey.shade600,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 10),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey.shade600,
+              ),
             ),
           ),
-        ),
+          const SizedBox(height: 10),
+          Container(
+            height: 50,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(width: 1, color: Colors.grey.shade300),
+            ),
+            child: TextField(
+              controller: controller,
+              cursorColor: Colors.grey.shade600,
+              style: TextStyle(fontSize: fontSize),
+              decoration: InputDecoration(
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 20,
+                ),
+                border: InputBorder.none,
+                hintText: hint,
+                hintStyle: TextStyle(
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade400,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -246,7 +243,7 @@ class _AddCampusScreenState extends State<AddCampusScreen> {
                     GestureDetector(
                       onTap: () {
                         Navigator.of(context).pop();
-                        // Add logic to save campus data here
+                        _saveChanges();
                       },
                       child: Container(
                         width: 120,
@@ -303,5 +300,25 @@ class _AddCampusScreenState extends State<AddCampusScreen> {
         );
       },
     );
+  }
+
+  Future<void> _saveChanges() async {
+    if (_designationController.text.isEmpty ||
+        _officeOrDepartmentController.text.isEmpty ||
+        _timeReleaseController.text.isEmpty) {
+      Get.snackbar('Error', 'Please fill all fields');
+      return;
+    }
+
+    await _controller.addDesignation(
+      designation: _designationController.text,
+      officeOrDepartment: _officeOrDepartmentController.text,
+      timeRelease: _timeReleaseController.text,
+    );
+    if (_controller.isSuccess) {
+      Get.snackbar('Success', 'Added successfully');
+    } else {
+      Get.snackbar('Error', _controller.errorMessage);
+    }
   }
 }

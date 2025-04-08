@@ -1,5 +1,8 @@
+import 'package:autosched/screens/setup_manager_screen/campus/campust_list/campust_list_controller.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
 
 class CampusListScreen extends StatefulWidget {
   final String selectedItem;
@@ -16,22 +19,7 @@ class CampusListScreen extends StatefulWidget {
 }
 
 class _CampusListScreenState extends State<CampusListScreen> {
-  // Sample campus data
-  final List<List<String>> campusData = [
-    ["ID", "CAMPUS NAME", "CAMPUS TYPE", "ACTIONS"],
-    ["001", "USTP OROQUIETA", "SATELLITE", ""],
-    ["002", "USTP PANAON", "SATELLITE", ""],
-    ["001", "USTP OROQUIETA", "SATELLITE", ""],
-    ["002", "USTP PANAON", "SATELLITE", ""],
-    ["001", "USTP OROQUIETA", "SATELLITE", ""],
-    ["002", "USTP PANAON", "SATELLITE", ""],
-    ["001", "USTP OROQUIETA", "SATELLITE", ""],
-    ["002", "USTP PANAON", "SATELLITE", ""],
-    ["001", "USTP OROQUIETA", "SATELLITE", ""],
-    ["002", "USTP PANAON", "SATELLITE", ""],
-    ["001", "USTP OROQUIETA", "SATELLITE", ""],
-    ["002", "USTP PANAON", "SATELLITE", ""],
-  ];
+  final CampustListController controller = Get.put(CampustListController());
 
   @override
   Widget build(BuildContext context) {
@@ -50,10 +38,7 @@ class _CampusListScreenState extends State<CampusListScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(
-                      bottom: 10,
-                      left: 20,
-                    ),
+                    padding: const EdgeInsets.only(bottom: 10, left: 20),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -87,7 +72,7 @@ class _CampusListScreenState extends State<CampusListScreen> {
                             IconButton(
                               icon: const Icon(
                                 Icons.delete,
-                                color:  Color.fromARGB(255, 243, 20, 4),
+                                color: Color.fromARGB(255, 243, 20, 4),
                                 size: 50,
                               ),
                               onPressed: () {},
@@ -99,13 +84,36 @@ class _CampusListScreenState extends State<CampusListScreen> {
                   ),
                   const SizedBox(height: 30),
                   Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: List.generate(campusData.length, (index) {
-                          return _buildRow(campusData[index], index);
-                        }),
-                      ),
-                    ),
+                    child: Obx(() {
+                      if (controller.isLoading.value) {
+                        return Center(child: CircularProgressIndicator());
+                      } else {
+                        return SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              _buildRow([
+                                "ID",
+                                "CAMPUS NAME",
+                                "CAMPUS TYPE",
+                                "ACTIONS",
+                              ], 0),
+                              ...controller.campuses.asMap().entries.map((
+                                entry,
+                              ) {
+                                int idx = entry.key;
+                                var campus = entry.value;
+                                return _buildRow([
+                                  campus['id'].toString(),
+                                  campus['campus_name'],
+                                  campus['campus_type'],
+                                  "",
+                                ], idx + 1);
+                              }),
+                            ],
+                          ),
+                        );
+                      }
+                    }),
                   ),
                 ],
               ),
@@ -115,6 +123,8 @@ class _CampusListScreenState extends State<CampusListScreen> {
       ),
     );
   }
+
+  // ... (keep the existing _buildRow, _rowText, and _actionIcons methods)
 
   // Function to build each row dynamically
   Widget _buildRow(List<String> values, int index) {
@@ -129,19 +139,16 @@ class _CampusListScreenState extends State<CampusListScreen> {
       ),
       child: Row(
         children: [
-          Expanded(flex: 1, child: _rowText(values[0], isHeader)), // ID Column
-          Expanded(
-            flex: 3,
-            child: _rowText(values[1], isHeader),
-          ), // Campus Name
+          Expanded(flex: 1, child: _rowText(values[0], isHeader)),
+          Expanded(flex: 3, child: _rowText(values[1], isHeader)),
+          Expanded(flex: 2, child: _rowText(values[2], isHeader)),
           Expanded(
             flex: 2,
-            child: _rowText(values[2], isHeader),
-          ), // Campus Type
-          Expanded(
-            flex: 2,
-            child: isHeader ? _rowText(values[3], isHeader) : _actionIcons(),
-          ), // Actions
+            child:
+                isHeader
+                    ? _rowText(values[3], isHeader)
+                    : _actionIcons(values[0]),
+          ),
         ],
       ),
     );
@@ -158,8 +165,7 @@ class _CampusListScreenState extends State<CampusListScreen> {
     );
   }
 
-  // Actions Column Icons (Only for data rows)
-  Widget _actionIcons() {
+  Widget _actionIcons(String campusId) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -168,19 +174,15 @@ class _CampusListScreenState extends State<CampusListScreen> {
             Icons.content_paste_search_rounded,
             color: Colors.green,
             size: 40,
-          ), // View Icon
+          ),
           onPressed: () {
-            Navigator.pushNamed(context, '/viewcampus');
+            Navigator.pushNamed(context, '/viewcampus', arguments: campusId);
           },
         ),
         IconButton(
-          icon: const Icon(
-            Icons.edit,
-            color: Colors.green,
-            size: 40,
-          ), // Edit Icon
+          icon: const Icon(Icons.edit, color: Colors.green, size: 40),
           onPressed: () {
-            Navigator.pushNamed(context, '/editcampus');
+            Navigator.pushNamed(context, '/editcampus', arguments: campusId);
           },
         ),
       ],

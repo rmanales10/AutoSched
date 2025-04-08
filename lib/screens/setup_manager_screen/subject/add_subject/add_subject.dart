@@ -1,5 +1,7 @@
+import 'package:autosched/screens/setup_manager_screen/subject/add_subject/add_subject_controller.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class AddSubjectScreen extends StatefulWidget {
   const AddSubjectScreen({super.key});
@@ -9,6 +11,25 @@ class AddSubjectScreen extends StatefulWidget {
 }
 
 class _AddSubjectScreenState extends State<AddSubjectScreen> {
+  final _controller = Get.put(AddSubjectController());
+  final _subjectCodeController = TextEditingController();
+  final _descriptiveTitleController = TextEditingController();
+  final _labHoursController = TextEditingController();
+  final _labUnitController = TextEditingController();
+  final _lectHoursController = TextEditingController();
+  final _lecUnitController = TextEditingController();
+  final _creditController = TextEditingController();
+  final subjectArea = ['IT', 'CS', 'Engineering'];
+  final yearLevel = ['1st Year', '2nd Year'];
+  final program = ['Full-Time', 'Part-Time'];
+  final major = ['Computer Science', 'Information Technology', 'Engineering'];
+  final mode = ['Online', 'On-site'];
+  String? _selectedSubjectArea;
+  String? _selectedYearLevel;
+  String? _selectedProgram;
+  String? _selectedMajor;
+  String? _selectedMode;
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -70,7 +91,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
                             ),
                           ],
                         ),
-                            const SizedBox(height: 20),
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
@@ -90,33 +111,57 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
           spacing: 30,
           runSpacing: 30,
           children: [
-            _buildTextField("Input subject code", fontSize, width),
-            _buildTextField("Lab Units:", fontSize, width),
-            _buildTextField("Lab HRS:", fontSize, width),
-            _buildTextField("Input descriptive title", fontSize, width),
-            _buildTextField("Lec Units:", fontSize, width),
-            _buildTextField("Lec HRS:", fontSize, width),
-            _buildTextField("Input credit units", fontSize, width),
+            _buildTextField(
+              "Input subject code",
+              fontSize,
+              width,
+              _subjectCodeController,
+            ),
+            _buildTextField("Lab Units:", fontSize, width, _labUnitController),
+            _buildTextField("Lab HRS:", fontSize, width, _labHoursController),
+            _buildTextField(
+              "Input descriptive title",
+              fontSize,
+              width,
+              _descriptiveTitleController,
+            ),
+            _buildTextField("Lec Units:", fontSize, width, _lecUnitController),
+            _buildTextField("Lec HRS:", fontSize, width, _lectHoursController),
+            _buildTextField(
+              "Input credit units",
+              fontSize,
+              width,
+              _creditController,
+            ),
             _buildDropdownField(
-              ['IT', 'CS', 'Engineering'],
+              subjectArea,
               'Subject Area',
               fontSize,
               width,
+              _selectedSubjectArea,
             ),
             _buildDropdownField(
-              ['1st Year', '2nd Year'],
+              yearLevel,
               'Year Level',
               fontSize,
               width,
+              _selectedYearLevel,
             ),
-            _buildDropdownField(['BSIT', 'BSCS'], 'Program', fontSize, width),
             _buildDropdownField(
-              ['Software', 'Network'],
+              program,
+              'Program',
+              fontSize,
+              width,
+              _selectedProgram,
+            ),
+            _buildDropdownField(
+              major,
               'Major',
               fontSize,
               width,
+              _selectedMajor,
             ),
-            _buildDropdownField(['Online', 'Hybrid'], 'Mode', fontSize, width),
+            _buildDropdownField(mode, 'Mode', fontSize, width, _selectedMode),
           ],
         ),
       ],
@@ -152,7 +197,12 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
     );
   }
 
-  Widget _buildTextField(String hint, double fontSize, double width) {
+  Widget _buildTextField(
+    String hint,
+    double fontSize,
+    double width,
+    TextEditingController? controller,
+  ) {
     return SizedBox(
       width: width,
       child: Container(
@@ -163,6 +213,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
           border: Border.all(width: 1, color: Colors.grey.shade300),
         ),
         child: TextField(
+          controller: controller,
           cursorColor: Colors.grey[600],
           style: TextStyle(fontSize: fontSize),
           decoration: InputDecoration(
@@ -187,61 +238,69 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
     String hint,
     double fontSize,
     double width,
+    String? selectedValue,
   ) {
-    String? selectedValue;
-
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return SizedBox(
-          width: width,
-          child: Container(
-            height: 50,
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(30),
-              border: Border.all(width: 1, color: Colors.grey.shade300),
+    return SizedBox(
+      width: width,
+      child: Container(
+        height: 50,
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(width: 1, color: Colors.grey.shade300),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            padding: EdgeInsets.only(left: 5),
+            borderRadius: BorderRadius.circular(30),
+            value: selectedValue,
+            icon: Icon(
+              Icons.arrow_drop_down_rounded,
+              color: Colors.grey.shade600,
+              size: 24,
             ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                padding: EdgeInsets.only(left: 5),
-                borderRadius: BorderRadius.circular(30),
-                value: selectedValue,
-                icon: Icon(
-                  Icons.arrow_drop_down_rounded,
-                  color: Colors.grey.shade600,
-                  size: 24,
-                ),
-                hint: Text(
-                  hint,
-                  style: TextStyle(
-                    fontSize: fontSize,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-                items:
-                    items.map((item) {
-                      return DropdownMenuItem(
-                        value: item,
-                        child: Text(
-                          item,
-                          style: TextStyle(
-                            fontSize: fontSize,
-                            color: Colors.grey.shade800,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedValue = value;
-                  });
-                },
-              ),
+            hint: Text(
+              hint,
+              style: TextStyle(fontSize: fontSize, color: Colors.grey.shade600),
             ),
+            items:
+                items.map((item) {
+                  return DropdownMenuItem(
+                    value: item,
+                    child: Text(
+                      item,
+                      style: TextStyle(
+                        fontSize: fontSize,
+                        color: Colors.grey.shade800,
+                      ),
+                    ),
+                  );
+                }).toList(),
+            onChanged: (value) {
+              setState(() {
+                switch (hint) {
+                  case 'Subject Area':
+                    _selectedSubjectArea = value;
+                    break;
+                  case 'Year Level':
+                    _selectedYearLevel = value;
+                    break;
+                  case 'Program':
+                    _selectedProgram = value;
+                    break;
+                  case 'Major':
+                    _selectedMajor = value;
+                    break;
+                  case 'Mode':
+                    _selectedMode = value;
+                    break;
+                }
+              });
+            },
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -277,7 +336,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
                     GestureDetector(
                       onTap: () {
                         Navigator.of(context).pop();
-                        // Add save logic here
+                        addSubject();
                       },
                       child: Container(
                         width: 120,
@@ -332,5 +391,70 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
         );
       },
     );
+  }
+
+  Future<void> addSubject() async {
+    if (_subjectCodeController.text.isEmpty ||
+        _descriptiveTitleController.text.isEmpty ||
+        _lecUnitController.text.isEmpty ||
+        _lectHoursController.text.isEmpty ||
+        _labUnitController.text.isEmpty ||
+        _labHoursController.text.isEmpty ||
+        _creditController.text.isEmpty ||
+        _selectedSubjectArea == null ||
+        _selectedProgram == null ||
+        _selectedMajor == null ||
+        _selectedMode == null) {
+      Get.snackbar(
+        'Error',
+        'Please fill in all fields',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    try {
+      await _controller.addSubject(
+        subjectCode: _subjectCodeController.text,
+        descriptiveTitle: _descriptiveTitleController.text,
+        lec: int.parse(_lecUnitController.text),
+        lecHrs: _lectHoursController.text,
+        lab: int.parse(_labUnitController.text),
+        labHrs: _labHoursController.text,
+        credit: int.parse(_creditController.text),
+        subjectArea: _selectedSubjectArea!,
+        yearLevel: _selectedYearLevel!,
+        program: _selectedProgram!,
+        major: _selectedMajor!,
+        mode: _selectedMode!,
+      );
+
+      Get.snackbar(
+        'Success',
+        'Subject added successfully',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+
+      // Clear the form fields after successful addition
+      _subjectCodeController.clear();
+      _descriptiveTitleController.clear();
+      _lecUnitController.clear();
+      _lectHoursController.clear();
+      _labUnitController.clear();
+      _labHoursController.clear();
+      _creditController.clear();
+      setState(() {
+        _selectedSubjectArea = null;
+        _selectedProgram = null;
+        _selectedMajor = null;
+        _selectedMode = null;
+      });
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to add subject: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
 }
