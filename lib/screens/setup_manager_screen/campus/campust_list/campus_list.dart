@@ -221,6 +221,7 @@ class _CampusListScreenState extends State<CampusListScreen> {
                       onTap: () async {
                         await controller.deleteCampuses(campusId: campusId);
                         await controller.fetchCampuses();
+                        // ignore: use_build_context_synchronously
                         Navigator.of(context).pop();
                       },
                       child: Container(

@@ -43,12 +43,12 @@ class CampustListController extends GetxController {
     error.value = '';
     try {
       final response = await GetConnect().post(
-        'http://localhost/autosched/backend_php/api/delete_campus.php',
-        {'campus_id': campusId},
+        'http://localhost/autosched/backend_php/api/delete_row.php',
+        {'table': 'campus_list', 'id': campusId},
       );
 
       if (response.status.hasError) {
-        throw Exception('Failed to delete campuse');
+        throw Exception('Failed to delete campus');
       }
 
       final body = response.body;

@@ -1,4 +1,5 @@
 import 'package:autosched/screens/setup_manager_screen/designation/designation_list/designation_list_controller.dart';
+import 'package:autosched/screens/setup_manager_screen/designation/editdesignation.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -22,16 +23,6 @@ class _DesignationListScreenState extends State<DesignationListScreen> {
     DesignationListController(),
   );
   late String selectedItem;
-
-  final List<List<String>> designationData = [
-    ["ID", "DESIGNATION", "OFFICE/DEPARTMENT", "TIME RELEASE", "ACTIONS"],
-    ["001", "CHAIRPERSON", "IT DEPARTMENT", "9 UNITS", ""],
-    ["002", "REGISTRAR", "ADMIN OFFICE", "9 UNITS", ""],
-    ["003", "DEAN", "COLLEGE OF ENGINEERING", "12 UNITS", ""],
-    ["004", "PROGRAM COORDINATOR", "CS DEPARTMENT", "6 UNITS", ""],
-    ["005", "LIBRARIAN", "LIBRARY", "9 UNITS", ""],
-    ["006", "GUIDANCE COUNSELOR", "GUIDANCE OFFICE", "9 UNITS", ""],
-  ];
 
   @override
   void initState() {
@@ -96,16 +87,6 @@ class _DesignationListScreenState extends State<DesignationListScreen> {
                               ),
                               onPressed: () {
                                 Navigator.pushNamed(context, '/adddesignation');
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.delete,
-                                color: Color.fromARGB(255, 243, 20, 4),
-                                size: 50,
-                              ),
-                              onPressed: () {
-                                // Delete Action
                               },
                             ),
                           ],
@@ -191,7 +172,10 @@ class _DesignationListScreenState extends State<DesignationListScreen> {
           ), // Time Release
           Expanded(
             flex: 2,
-            child: isHeader ? _rowText(values[4], isHeader) : _actionIcons(),
+            child:
+                isHeader
+                    ? _rowText(values[4], isHeader)
+                    : _actionIcons(values[0], values[1], values[2], values[3]),
           ), // Actions
         ],
       ),
@@ -210,7 +194,12 @@ class _DesignationListScreenState extends State<DesignationListScreen> {
   }
 
   // Actions Column Icons (Only for data rows)
-  Widget _actionIcons() {
+  Widget _actionIcons(
+    String designationId,
+    String designation,
+    String department,
+    String time,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -226,11 +215,135 @@ class _DesignationListScreenState extends State<DesignationListScreen> {
         // ),
         IconButton(
           icon: const Icon(Icons.edit, color: Colors.green, size: 40),
-          onPressed: () {
-            Navigator.pushNamed(context, '/editdesignation');
-          },
+          onPressed:
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (context) => EditDesignationScreen(
+                        id: designationId,
+                        designation: designation,
+                        department: department,
+                        time: time,
+                      ),
+                ),
+              ),
+        ),
+        IconButton(
+          icon: const Icon(
+            Icons.delete,
+            color: Color.fromARGB(255, 243, 20, 4),
+            size: 50,
+          ),
+          onPressed:
+              () => _showConfirmationDialog(
+                context,
+                designationId,
+                designation,
+                department,
+                time,
+              ),
         ),
       ],
+    );
+  }
+
+  void _showConfirmationDialog(
+    BuildContext context,
+    String id,
+    String designation,
+    String department,
+    String time,
+  ) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            width: 500,
+            height: 200,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Do you want to add changes ?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        await controller.deleteDesignation(id: id);
+                        await controller.fetchDesignations();
+                        // ignore: use_build_context_synchronously
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        width: 120,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF010042),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "Submit",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        width: 120,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: Colors.grey.shade400,
+                            width: 1,
+                          ),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "No",
+                            style: TextStyle(
+                              color: Color(0xFF010042),
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

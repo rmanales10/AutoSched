@@ -1,5 +1,4 @@
 import 'package:autosched/screens/setup_manager_screen/campus/add_campus/add_campus_controller.dart';
-import 'package:autosched/screens/setup_manager_screen/campus/campust_list/campus_list.dart';
 import 'package:autosched/screens/setup_manager_screen/campus/campust_list/campust_list_controller.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
@@ -339,14 +338,8 @@ class _AddCampusScreenState extends State<AddCampusScreen> {
       Get.snackbar('Success', 'Campus added successfully');
       _campusNameController.clear();
       _addressController.clear();
-      Get.off(
-        () => CampusListScreen(
-          selectedItem: 'Campus',
-          onItemSelected: (String title, String route) {
-            Navigator.pushNamed(context, route);
-          },
-        ),
-      );
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacementNamed(context, '/setup-manager/campus');
       await _campusListController.fetchCampuses();
     } else {
       Get.snackbar('Failed', _controller.errorMessage);

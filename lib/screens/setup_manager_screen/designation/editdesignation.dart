@@ -2,13 +2,36 @@ import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 
 class EditDesignationScreen extends StatefulWidget {
-  const EditDesignationScreen({super.key});
+  final String id;
+  final String designation;
+  final String department;
+  final String time;
+
+  const EditDesignationScreen({
+    super.key,
+    required this.id,
+    required this.designation,
+    required this.department,
+    required this.time,
+  });
 
   @override
   _EditDesignationScreenState createState() => _EditDesignationScreenState();
 }
 
 class _EditDesignationScreenState extends State<EditDesignationScreen> {
+  final _designationController = TextEditingController();
+  final _departmentController = TextEditingController();
+  final _timeController = TextEditingController();
+
+  @override
+  void initState() {
+    _designationController.text = widget.designation;
+    _departmentController.text = widget.department;
+    _timeController.text = widget.time;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -93,9 +116,27 @@ class _EditDesignationScreenState extends State<EditDesignationScreen> {
           spacing: 30,
           runSpacing: 30,
           children: [
-            _buildTextField( "Input designation", "Designation", fontSize, width),
-            _buildTextField( "Input office/department", "Office/Department", fontSize, width),
-            _buildTextField( "Input time release", "Time Release", fontSize, width),
+            _buildTextField(
+              "Input designation",
+              "Designation",
+              fontSize,
+              width,
+              _designationController,
+            ),
+            _buildTextField(
+              "Input office/department",
+              "Office/Department",
+              fontSize,
+              width,
+              _departmentController,
+            ),
+            _buildTextField(
+              "Input time release",
+              "Time Release",
+              fontSize,
+              width,
+              _timeController,
+            ),
           ],
         ),
       ],
@@ -131,7 +172,13 @@ class _EditDesignationScreenState extends State<EditDesignationScreen> {
     );
   }
 
-  Widget _buildTextField(String hint, String label, double fontSize, double width) {
+  Widget _buildTextField(
+    String hint,
+    String label,
+    double fontSize,
+    double width,
+    TextEditingController? controller,
+  ) {
     return SizedBox(
       width: width,
       child: Column(
@@ -157,6 +204,7 @@ class _EditDesignationScreenState extends State<EditDesignationScreen> {
               border: Border.all(width: 1, color: Colors.grey.shade300),
             ),
             child: TextField(
+              controller: controller,
               cursorColor: Colors.grey.shade600,
               style: TextStyle(fontSize: fontSize),
               decoration: InputDecoration(

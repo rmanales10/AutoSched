@@ -1,5 +1,5 @@
 import 'package:autosched/screens/setup_manager_screen/designation/add_designation/add_designation_controller.dart';
-import 'package:autosched/screens/setup_manager_screen/designation/designation_list/designation_list.dart';
+import 'package:autosched/screens/setup_manager_screen/designation/designation_list/designation_list_controller.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,6 +12,7 @@ class AddDesignationScreen extends StatefulWidget {
 }
 
 class _AddDesignationScreenState extends State<AddDesignationScreen> {
+  final _designationListController = Get.put(DesignationListController());
   final _controller = Get.put(AddDesignationController());
   final _designationController = TextEditingController();
   final _officeOrDepartmentController = TextEditingController();
@@ -318,14 +319,9 @@ class _AddDesignationScreenState extends State<AddDesignationScreen> {
     );
     if (_controller.isSuccess) {
       Get.snackbar('Success', 'Added successfully');
-      Get.off(
-        () => DesignationListScreen(
-          selectedItem: 'Designation',
-          onItemSelected: (String title, String route) {
-            Navigator.pushNamed(context, route);
-          },
-        ),
-      );
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacementNamed(context, '/setup-manager/designation');
+      await _designationListController.fetchDesignations();
     } else {
       Get.snackbar('Error', _controller.errorMessage);
     }

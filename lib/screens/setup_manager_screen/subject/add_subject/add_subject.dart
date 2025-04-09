@@ -1,5 +1,5 @@
 import 'package:autosched/screens/setup_manager_screen/subject/add_subject/add_subject_controller.dart';
-import 'package:autosched/screens/setup_manager_screen/subject/subject_list/subjects_list.dart';
+import 'package:autosched/screens/setup_manager_screen/subject/subject_list/subject_list_controller.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +13,7 @@ class AddSubjectScreen extends StatefulWidget {
 }
 
 class _AddSubjectScreenState extends State<AddSubjectScreen> {
+  final _subjectListController = Get.put(SubjectListController());
   final _controller = Get.put(AddSubjectController());
   final _subjectCodeController = TextEditingController();
   final _descriptiveTitleController = TextEditingController();
@@ -455,14 +456,9 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
         _selectedMajor = null;
         _selectedMode = null;
       });
-      Get.off(
-        () => SubjectsListScreen(
-          selectedItem: 'Subjects',
-          onItemSelected: (String title, String route) {
-            Navigator.pushNamed(context, route);
-          },
-        ),
-      );
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacementNamed(context, '/setup-manager/subjects');
+      await _subjectListController.fetchSubjects();
     } catch (e) {
       Get.snackbar('Error', 'Failed to add subject: $e');
     }

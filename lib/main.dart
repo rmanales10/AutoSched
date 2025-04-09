@@ -15,7 +15,6 @@ import 'package:autosched/screens/setup_manager_screen/campus/editcampus.dart';
 import 'package:autosched/screens/setup_manager_screen/campus/view_campus.dart';
 import 'package:autosched/screens/setup_manager_screen/designation/add_designation/add_designation.dart';
 import 'package:autosched/screens/setup_manager_screen/designation/designation_list/designation_list.dart';
-import 'package:autosched/screens/setup_manager_screen/designation/editdesignation.dart';
 import 'package:autosched/screens/setup_manager_screen/designation/viewdesignation.dart';
 import 'package:autosched/screens/setup_manager_screen/faculty/add_faculty/addfaculty.dart';
 import 'package:autosched/screens/setup_manager_screen/rooms/add_rooms/addroom.dart';
@@ -110,7 +109,7 @@ class MyApp extends StatelessWidget {
         '/editcampus': (context) => const EditCampusScreen(),
         '/adddesignation': (context) => const AddDesignationScreen(),
         '/viewdesignation': (context) => const ViewDesignationScreen(),
-        '/editdesignation': (context) => const EditDesignationScreen(),
+        // '/editdesignation': (context) => const EditDesignationScreen(),
         '/viewroom': (context) => const ViewRoomScreen(),
         '/editroom': (context) => const EditRoomScreen(),
         '/addsubject': (context) => const AddSubjectScreen(),

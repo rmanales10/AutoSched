@@ -1,5 +1,4 @@
 import 'package:autosched/screens/setup_manager_screen/faculty/add_faculty/addfaculty_controller.dart';
-import 'package:autosched/screens/setup_manager_screen/faculty/faculty.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -487,15 +486,9 @@ class _AddFacultyScreenState extends State<AddFacultyScreen> {
       designation: selectedDesignation!,
       constraints: selectedConstraint!,
     );
-    if (_controller.isSuccess == true) {
-      Get.off(
-        () => FacultyScreen(
-          selectedItem: 'Faculty',
-          onItemSelected: (String title, String route) {
-            Navigator.pushNamed(context, route);
-          },
-        ),
-      );
+    if (_controller.isSuccess) {
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacementNamed(context, '/setup-manager/faculty');
     }
   }
 }

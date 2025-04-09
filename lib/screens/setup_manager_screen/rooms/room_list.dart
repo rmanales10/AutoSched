@@ -21,30 +21,6 @@ class _RoomScreenState extends State<RoomScreen> {
   late String selectedItem;
   final _controller = Get.put(RoomController());
 
-  final List<List<String>> roomData = [
-    ["ID", "ROOM NUMBER", "ROOM NAME", "ROOM TYPE", "ACTIONS"],
-    ["001", "01", "MAKESHIFT ROOM", "LECTURE", ""],
-    ["002", "01", "COMP LAB", "LABORATORY", ""],
-    ["001", "01", "MAKESHIFT ROOM", "LECTURE", ""],
-    ["002", "01", "COMP LAB", "LABORATORY", ""],
-    ["001", "01", "MAKESHIFT ROOM", "LECTURE", ""],
-    ["002", "01", "COMP LAB", "LABORATORY", ""],
-    ["001", "01", "MAKESHIFT ROOM", "LECTURE", ""],
-    ["002", "01", "COMP LAB", "LABORATORY", ""],
-    ["001", "01", "MAKESHIFT ROOM", "LECTURE", ""],
-    ["002", "01", "COMP LAB", "LABORATORY", ""],
-    ["001", "01", "MAKESHIFT ROOM", "LECTURE", ""],
-    ["002", "01", "COMP LAB", "LABORATORY", ""],
-    ["001", "01", "MAKESHIFT ROOM", "LECTURE", ""],
-    ["002", "01", "COMP LAB", "LABORATORY", ""],
-    ["001", "01", "MAKESHIFT ROOM", "LECTURE", ""],
-    ["002", "01", "COMP LAB", "LABORATORY", ""],
-    ["001", "01", "MAKESHIFT ROOM", "LECTURE", ""],
-    ["002", "01", "COMP LAB", "LABORATORY", ""],
-    ["001", "01", "MAKESHIFT ROOM", "LECTURE", ""],
-    ["002", "01", "COMP LAB", "LABORATORY", ""],
-  ];
-
   @override
   void initState() {
     selectedItem = widget.selectedItem;
@@ -68,29 +44,71 @@ class _RoomScreenState extends State<RoomScreen> {
           ),
           Expanded(
             child: Obx(() {
-              return SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _buildRow([
-                      "ID",
-                      "ROOM NUMBER",
-                      "ROOM NAME",
-                      "ROOM TYPE",
-                      "ACTIONS",
-                    ], 0),
-                    ..._controller.rooms.asMap().entries.map((entry) {
-                      int index = entry.key + 1;
-                      Map<String, dynamic> room = entry.value;
-                      return _buildRow([
-                        room['room_id'].toString(),
-                        room['room_number'] ?? '',
-                        room['room_name'] ?? '',
-                        room['room_type'] ?? '',
-                        "",
-                      ], index);
-                    }),
-                  ],
-                ),
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: 30,
+                      bottom: 20,
+                      left: 20,
+                      right: 20,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'ROOM LIST',
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.print,
+                                color: Colors.green,
+                                size: 40,
+                              ),
+                              onPressed: () {
+                                // Print Action
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.note_add_rounded,
+                                color: Color.fromARGB(255, 1, 0, 66),
+                                size: 40,
+                              ),
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/addfaculty');
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          children: [
+                            _buildHeaderRow(),
+                            ..._controller.rooms.asMap().entries.map((entry) {
+                              int index = entry.key;
+                              Map<String, dynamic> room = entry.value;
+                              return _buildDataRow(room, index);
+                            }),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               );
             }),
           ),
@@ -99,45 +117,66 @@ class _RoomScreenState extends State<RoomScreen> {
     );
   }
 
-  // Function to build each row dynamically
-  Widget _buildRow(List<String> values, int index) {
-    bool isHeader = index == 0;
-    bool isEvenRow = index % 2 == 0;
-
+  Widget _buildHeaderRow() {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
-        color:
-            isHeader
-                ? Colors.white
-                : (isEvenRow ? Colors.white : Colors.transparent),
-        borderRadius: BorderRadius.circular(30),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            // ignore: deprecated_member_use
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          Expanded(flex: 1, child: _rowText(values[0], isHeader)), // ID
-          Expanded(
-            flex: 2,
-            child: _rowText(values[1], isHeader),
-          ), // Room Number
-          Expanded(flex: 3, child: _rowText(values[2], isHeader)), // Room Name
-          Expanded(flex: 2, child: _rowText(values[3], isHeader)), // Room Type
-          Expanded(
-            flex: 2,
-            child: isHeader ? _rowText(values[4], isHeader) : _actionIcons(),
-          ), // Actions
+          Expanded(flex: 1, child: _headerText("ID")),
+          Expanded(flex: 2, child: _headerText("ROOM NUMBER")),
+          Expanded(flex: 3, child: _headerText("ROOM NAME")),
+          Expanded(flex: 2, child: _headerText("ROOM TYPE")),
+          Expanded(flex: 2, child: _headerText("ACTIONS")),
         ],
       ),
     );
   }
 
-  Widget _rowText(String text, bool isHeader) {
+  Widget _headerText(String text) {
     return Text(
       text,
-      style: TextStyle(
-        fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-        fontSize: 20,
+      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  Widget _buildDataRow(Map<String, dynamic> room, int index) {
+    bool isEvenRow = index % 2 == 0;
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        color: isEvenRow ? Colors.white : Colors.grey[100],
+        borderRadius: BorderRadius.circular(8),
       ),
+      child: Row(
+        children: [
+          Expanded(flex: 1, child: _rowText(room['room_id'].toString())),
+          Expanded(flex: 2, child: _rowText(room['room_number'] ?? '')),
+          Expanded(flex: 3, child: _rowText(room['room_name'] ?? '')),
+          Expanded(flex: 2, child: _rowText(room['room_type'] ?? '')),
+          Expanded(flex: 2, child: _actionIcons()),
+        ],
+      ),
+    );
+  }
+
+  Widget _rowText(String text) {
+    return Text(
+      text,
+      style: const TextStyle(fontSize: 14),
       textAlign: TextAlign.center,
     );
   }
@@ -150,12 +189,12 @@ class _RoomScreenState extends State<RoomScreen> {
           icon: const Icon(
             Icons.content_paste_search_rounded,
             color: Colors.green,
-            size: 40,
+            size: 24,
           ),
           onPressed: () {},
         ),
         IconButton(
-          icon: const Icon(Icons.edit, color: Colors.green, size: 40),
+          icon: const Icon(Icons.edit, color: Colors.green, size: 24),
           onPressed: () {},
         ),
       ],
