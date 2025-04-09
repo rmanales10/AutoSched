@@ -34,7 +34,6 @@ class AddCampusController extends GetxController {
         final body = response.body;
         if (body['status'] == 'success') {
           _isSuccess.value = true;
-          Get.snackbar('Success', 'Campus added successfully');
         } else {
           _errorMessage.value = body['message'] ?? 'An unknown error occurred';
         }

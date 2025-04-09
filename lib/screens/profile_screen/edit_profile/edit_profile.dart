@@ -72,11 +72,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             backgroundImage: AssetImage('assets/profile.png'),
                           ),
                           const SizedBox(width: 20),
-                          Text(
-                            'SCHED',
-                            style: TextStyle(
-                              fontSize: fontSize + 8,
-                              fontWeight: FontWeight.bold,
+                          Obx(
+                            () => Text(
+                              _editProfilecontroller
+                                      .currentUser['access_role'] ??
+                                  'N/A',
+                              style: TextStyle(
+                                fontSize: fontSize + 8,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],
@@ -120,9 +124,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             "Cancel",
                             const Color.fromARGB(255, 243, 20, 4),
                             Colors.white,
-                            onTap: () {
-                              Get.off(ProfileScreen());
-                            },
+                            onTap: () => Navigator.pop(context),
                           ),
                         ],
                       ),

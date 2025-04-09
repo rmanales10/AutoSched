@@ -1,4 +1,5 @@
 import 'package:autosched/screens/setup_manager_screen/designation/add_designation/add_designation_controller.dart';
+import 'package:autosched/screens/setup_manager_screen/designation/designation_list/designation_list.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -317,6 +318,14 @@ class _AddDesignationScreenState extends State<AddDesignationScreen> {
     );
     if (_controller.isSuccess) {
       Get.snackbar('Success', 'Added successfully');
+      Get.off(
+        () => DesignationListScreen(
+          selectedItem: 'Designation',
+          onItemSelected: (String title, String route) {
+            Navigator.pushNamed(context, route);
+          },
+        ),
+      );
     } else {
       Get.snackbar('Error', _controller.errorMessage);
     }

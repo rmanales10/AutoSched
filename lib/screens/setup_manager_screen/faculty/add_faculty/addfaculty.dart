@@ -1,5 +1,5 @@
 import 'package:autosched/screens/setup_manager_screen/faculty/add_faculty/addfaculty_controller.dart';
-import 'package:autosched/screens/teaching_load_screen/teaching_load_list/teaching_load.dart';
+import 'package:autosched/screens/setup_manager_screen/faculty/faculty.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -463,6 +463,19 @@ class _AddFacultyScreenState extends State<AddFacultyScreen> {
   }
 
   Future<void> _addFaculty() async {
+    if (_firstNameController.text.isEmpty ||
+        _lastNameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _phoneController.text.isEmpty ||
+        selectedPosition == null ||
+        selectedStatus == null ||
+        selectedDepartment == null ||
+        selectedDesignation == null ||
+        selectedConstraint == null) {
+      Get.snackbar('Failed', 'All fields are required.');
+      return;
+    }
+
     await _controller.addFaculty(
       firstName: _firstNameController.text,
       lastName: _lastNameController.text,
@@ -475,7 +488,14 @@ class _AddFacultyScreenState extends State<AddFacultyScreen> {
       constraints: selectedConstraint!,
     );
     if (_controller.isSuccess == true) {
-      Get.off(() => TeachingLoadScreen());
+      Get.off(
+        () => FacultyScreen(
+          selectedItem: 'Faculty',
+          onItemSelected: (String title, String route) {
+            Navigator.pushNamed(context, route);
+          },
+        ),
+      );
     }
   }
 }

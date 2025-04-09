@@ -1,6 +1,8 @@
 import 'package:autosched/screens/setup_manager_screen/subject/add_subject/add_subject_controller.dart';
+import 'package:autosched/screens/setup_manager_screen/subject/subject_list/subjects_list.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 class AddSubjectScreen extends StatefulWidget {
@@ -117,7 +119,13 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
               width,
               _subjectCodeController,
             ),
-            _buildTextField("Lab Units:", fontSize, width, _labUnitController),
+            _buildTextField(
+              "Lab Units:",
+              fontSize,
+              width,
+              _labUnitController,
+              numericOnly: true,
+            ),
             _buildTextField("Lab HRS:", fontSize, width, _labHoursController),
             _buildTextField(
               "Input descriptive title",
@@ -125,13 +133,20 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
               width,
               _descriptiveTitleController,
             ),
-            _buildTextField("Lec Units:", fontSize, width, _lecUnitController),
+            _buildTextField(
+              "Lec Units:",
+              fontSize,
+              width,
+              _lecUnitController,
+              numericOnly: true,
+            ),
             _buildTextField("Lec HRS:", fontSize, width, _lectHoursController),
             _buildTextField(
               "Input credit units",
               fontSize,
               width,
               _creditController,
+              numericOnly: true,
             ),
             _buildDropdownField(
               subjectArea,
@@ -201,8 +216,9 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
     String hint,
     double fontSize,
     double width,
-    TextEditingController? controller,
-  ) {
+    TextEditingController? controller, {
+    bool numericOnly = false, // Add this parameter
+  }) {
     return SizedBox(
       width: width,
       child: Container(
@@ -213,6 +229,8 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
           border: Border.all(width: 1, color: Colors.grey.shade300),
         ),
         child: TextField(
+          inputFormatters:
+              numericOnly ? [FilteringTextInputFormatter.digitsOnly] : null,
           controller: controller,
           cursorColor: Colors.grey[600],
           style: TextStyle(fontSize: fontSize),
@@ -334,10 +352,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        addSubject();
-                      },
+                      onTap: () => addSubject(),
                       child: Container(
                         width: 120,
                         height: 30,
@@ -405,11 +420,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
         _selectedProgram == null ||
         _selectedMajor == null ||
         _selectedMode == null) {
-      Get.snackbar(
-        'Error',
-        'Please fill in all fields',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar('Error', 'Please fill in all fields');
       return;
     }
 
@@ -429,13 +440,8 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
         mode: _selectedMode!,
       );
 
-      Get.snackbar(
-        'Success',
-        'Subject added successfully',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar('Success', 'Subject added successfully');
 
-      // Clear the form fields after successful addition
       _subjectCodeController.clear();
       _descriptiveTitleController.clear();
       _lecUnitController.clear();
@@ -449,12 +455,16 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
         _selectedMajor = null;
         _selectedMode = null;
       });
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to add subject: $e',
-        snackPosition: SnackPosition.BOTTOM,
+      Get.off(
+        () => SubjectsListScreen(
+          selectedItem: 'Subjects',
+          onItemSelected: (String title, String route) {
+            Navigator.pushNamed(context, route);
+          },
+        ),
       );
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to add subject: $e');
     }
   }
 }

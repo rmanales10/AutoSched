@@ -395,7 +395,7 @@ class _CreateTeachingLoadScreenState extends State<CreateTeachingLoadScreen> {
       year3: sections['3rd Year']!,
       year4: sections['4th Year']!,
     );
-    if (_controller.isSuccess == true) {
+    if (_controller.isSuccess) {
       Get.off(() => ViewTeachingLoadScreen());
     }
   }
