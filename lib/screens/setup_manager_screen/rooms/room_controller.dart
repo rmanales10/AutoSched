@@ -16,9 +16,9 @@ class RoomController extends GetxService {
 
     try {
       final userId = _storage.read('user_id');
-      final response = await _connect.get(
-        'http://localhost/autosched/backend_php/api/get_rooms.php',
-        query: {'user_id': userId},
+      final response = await _connect.post(
+        'http://localhost/autosched/backend_php/api/get_row.php?table_name=rooms',
+        {'user_id': userId},
       );
 
       if (response.status.hasError) {

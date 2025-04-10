@@ -30,8 +30,9 @@ class ViewLoadController extends GetxController {
         return;
       }
 
-      final response = await _connect.get(
-        'http://localhost/autosched/backend_php/api/get_teaching_load.php?user_id=$userId',
+      final response = await _connect.post(
+        'http://localhost/autosched/backend_php/api/get_row.php?table_name=teaching_load_list',
+        {'user_id': userId},
       );
       if (response.status.hasError) {
         _errorMessage.value = 'Server error occurred';

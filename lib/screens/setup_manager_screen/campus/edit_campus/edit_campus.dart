@@ -1,17 +1,42 @@
+import 'package:autosched/screens/setup_manager_screen/campus/campust_list/campust_list_controller.dart';
+import 'package:autosched/screens/setup_manager_screen/campus/edit_campus/edit_campus_controller.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class EditCampusScreen extends StatefulWidget {
-  const EditCampusScreen({super.key});
+  final String campusId;
+  final String campusName;
+  final String campusType;
+  final String campusAddress;
+
+  const EditCampusScreen({
+    super.key,
+    required this.campusId,
+    required this.campusName,
+    required this.campusType,
+    required this.campusAddress,
+  });
 
   @override
   _EditCampusScreenState createState() => _EditCampusScreenState();
 }
 
 class _EditCampusScreenState extends State<EditCampusScreen> {
+  final _campustListController = Get.put(CampustListController());
+  final _controller = Get.put(EditCampusController());
+  final _campusNameController = TextEditingController();
+  final _addressController = TextEditingController();
   String? selectedCampusType;
 
- 
+  @override
+  void initState() {
+    _campusNameController.text = widget.campusName;
+    _addressController.text = widget.campusAddress;
+    selectedCampusType = widget.campusType;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -97,9 +122,14 @@ class _EditCampusScreenState extends State<EditCampusScreen> {
           spacing: 50,
           runSpacing: 30,
           children: [
-            _buildTextField("Campus Name", fontSize, width),
+            _buildTextField(
+              "Campus Name",
+              fontSize,
+              width,
+              _campusNameController,
+            ),
             _buildCampusTypeDropdown(fontSize, width),
-            _buildTextField("Address", fontSize, width),
+            _buildTextField("Address", fontSize, width, _addressController),
           ],
         ),
       ],
@@ -185,7 +215,12 @@ class _EditCampusScreenState extends State<EditCampusScreen> {
     );
   }
 
-  Widget _buildTextField(String hint, double fontSize, double width) {
+  Widget _buildTextField(
+    String hint,
+    double fontSize,
+    double width,
+    TextEditingController? controller,
+  ) {
     return SizedBox(
       width: width,
       child: Container(
@@ -196,6 +231,7 @@ class _EditCampusScreenState extends State<EditCampusScreen> {
           border: Border.all(width: 1, color: Colors.grey.shade300),
         ),
         child: TextField(
+          controller: controller,
           cursorColor: Colors.grey.shade600,
           style: TextStyle(fontSize: fontSize),
           decoration: InputDecoration(
@@ -245,10 +281,7 @@ class _EditCampusScreenState extends State<EditCampusScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        // Add logic to save campus data here
-                      },
+                      onTap: () => _saveCampusData(),
                       child: Container(
                         width: 120,
                         height: 30,
@@ -304,5 +337,22 @@ class _EditCampusScreenState extends State<EditCampusScreen> {
         );
       },
     );
+  }
+
+  Future<void> _saveCampusData() async {
+    await _controller.editCampus(
+      campusId: int.parse(widget.campusId),
+      campusName: _campusNameController.text,
+      campusType: selectedCampusType!,
+      address: _addressController.text,
+    );
+    if (_controller.isSuccess) {
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacementNamed(context, '/setup-manager/campus');
+      await _campustListController.fetchCampuses();
+      Get.snackbar('Success', 'Campus saved successfully');
+    } else {
+      Get.snackbar('Failed', _controller.errorMessage);
+    }
   }
 }

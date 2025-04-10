@@ -13,7 +13,7 @@ class FacultyLoadController extends GetxController {
   Future<void> fetchLoad() async {
     try {
       final response = await _connect.get(
-        'http://localhost/autosched/backend_php/api/get_faculty_load.php',
+        'http://localhost/autosched/backend_php/api/get_row.php?table_name=faculty_load',
       );
 
       if (response.status.hasError) {
@@ -62,7 +62,7 @@ class FacultyLoadController extends GetxController {
       }
 
       final response = await _connect.post(
-        'http://localhost/autosched/backend_php/api/get_faculty.php',
+        'http://localhost/autosched/backend_php/api/get_row.php?table_name=faculty',
         {'user_id': userId},
       );
 

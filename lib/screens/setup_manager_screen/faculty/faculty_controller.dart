@@ -19,7 +19,7 @@ class FacultyController extends GetxController {
 
       // Send request to PHP backend
       final response = await connect.post(
-        'http://localhost/autosched/backend_php/api/get_faculty.php',
+        'http://localhost/autosched/backend_php/api/get_row.php?table_name=faculty',
         {'user_id': userId},
       );
 

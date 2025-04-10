@@ -19,7 +19,7 @@ class SubjectListController extends GetxController {
 
     try {
       final response = await _connect.get(
-        'http://localhost/autosched/backend_php/api/get_subjects.php',
+        'http://localhost/autosched/backend_php/api/get_row.php?table_name=subjects',
       );
 
       if (response.status.hasError) {

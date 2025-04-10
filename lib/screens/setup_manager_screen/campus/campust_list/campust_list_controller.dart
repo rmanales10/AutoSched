@@ -17,7 +17,7 @@ class CampustListController extends GetxController {
 
     try {
       final response = await GetConnect().get(
-        'http://localhost/autosched/backend_php/api/get_campus.php',
+        'http://localhost/autosched/backend_php/api/get_row.php?table_name=campus_list',
         headers: {'Content-Type': 'application/json'},
       );
 

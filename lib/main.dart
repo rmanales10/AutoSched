@@ -11,7 +11,6 @@ import 'package:autosched/screens/profile_screen/profile/profile.dart';
 import 'package:autosched/screens/schedule_screen/generated_schedule.dart';
 import 'package:autosched/screens/setup_manager_screen/campus/add_campus/add_campus.dart';
 import 'package:autosched/screens/setup_manager_screen/campus/campust_list/campus_list.dart';
-import 'package:autosched/screens/setup_manager_screen/campus/editcampus.dart';
 import 'package:autosched/screens/setup_manager_screen/campus/view_campus.dart';
 import 'package:autosched/screens/setup_manager_screen/designation/add_designation/add_designation.dart';
 import 'package:autosched/screens/setup_manager_screen/designation/designation_list/designation_list.dart';
@@ -106,7 +105,7 @@ class MyApp extends StatelessWidget {
         '/addsubcur': (context) => const AddSubjectCurScreen(),
         '/addcampus': (context) => const AddCampusScreen(),
         '/viewcampus': (context) => const ViewCampusScreen(),
-        '/editcampus': (context) => const EditCampusScreen(),
+        // '/editcampus': (context) => const EditCampusScreen(),
         '/adddesignation': (context) => const AddDesignationScreen(),
         '/viewdesignation': (context) => const ViewDesignationScreen(),
         // '/editdesignation': (context) => const EditDesignationScreen(),

@@ -17,7 +17,7 @@ class DesignationListController extends GetxController {
 
     try {
       final response = await GetConnect().get(
-        'http://localhost/autosched/backend_php/api/get_designation.php',
+        'http://localhost/autosched/backend_php/api/get_row.php?table_name=designation_list',
         headers: {'Content-Type': 'application/json'},
       );
 

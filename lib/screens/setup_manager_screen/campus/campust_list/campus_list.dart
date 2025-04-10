@@ -1,4 +1,5 @@
 import 'package:autosched/screens/setup_manager_screen/campus/campust_list/campust_list_controller.dart';
+import 'package:autosched/screens/setup_manager_screen/campus/edit_campus/edit_campus.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -97,7 +98,7 @@ class _CampusListScreenState extends State<CampusListScreen> {
                                   campus['id'].toString(),
                                   campus['campus_name'],
                                   campus['campus_type'],
-                                  "",
+                                  campus['address'],
                                 ], idx + 1);
                               }),
                             ],
@@ -138,7 +139,7 @@ class _CampusListScreenState extends State<CampusListScreen> {
             child:
                 isHeader
                     ? _rowText(values[3], isHeader)
-                    : _actionIcons(values[0]),
+                    : _actionIcons(values[0], values[1], values[2], values[3]),
           ),
         ],
       ),
@@ -156,7 +157,12 @@ class _CampusListScreenState extends State<CampusListScreen> {
     );
   }
 
-  Widget _actionIcons(String campusId) {
+  Widget _actionIcons(
+    String campusId,
+    String campusName,
+    String campusType,
+    String address,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -167,14 +173,24 @@ class _CampusListScreenState extends State<CampusListScreen> {
             size: 40,
           ),
           onPressed: () {
-            Navigator.pushNamed(context, '/viewcampus', arguments: campusId);
+            Navigator.pushNamed(context, '/viewcampus');
           },
         ),
         IconButton(
           icon: const Icon(Icons.edit, color: Colors.green, size: 40),
-          onPressed: () {
-            Navigator.pushNamed(context, '/editcampus', arguments: campusId);
-          },
+          onPressed:
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (context) => EditCampusScreen(
+                        campusId: campusId,
+                        campusName: campusName,
+                        campusType: campusType,
+                        campusAddress: address,
+                      ),
+                ),
+              ),
         ),
         IconButton(
           icon: const Icon(
