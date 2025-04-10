@@ -32,25 +32,28 @@ class AddFacultyController extends GetxController {
       final userId = _storage.read('user_id') ?? 'default_user_id';
 
       final data = {
-        'user_id': userId,
-        'first_name': firstName,
-        'last_name': lastName,
-        'email': email,
-        'mobile_number': mobileNumber,
-        'position': position,
-        'status': status,
-        'department': department,
-        'designation': designation,
-        'constraints': constraints,
+        'table_name': 'faculty',
+        'columns': {
+          'user_id': userId,
+          'first_name': firstName,
+          'last_name': lastName,
+          'email': email,
+          'mobile_number': mobileNumber,
+          'position': position,
+          'status': status,
+          'department': department,
+          'designation': designation,
+          'constraints': constraints,
+        },
       };
 
       final response = await _connect.post(
-        'http://localhost/autosched/backend_php/api/add_faculty.php',
+        'http://localhost/autosched/backend_php/api/add_row.php',
         data,
       );
       if (response.body['status'] == 'success') {
         _isSuccess.value = true;
-        Get.snackbar('Success', response.body['message']);
+        Get.snackbar('Success', 'Faculty added successfully!');
       } else {
         Get.snackbar('Error', response.body['message']);
       }

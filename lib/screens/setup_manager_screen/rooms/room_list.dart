@@ -83,7 +83,7 @@ class _RoomScreenState extends State<RoomScreen> {
                                 size: 40,
                               ),
                               onPressed: () {
-                                Navigator.pushNamed(context, '/addfaculty');
+                                Navigator.pushNamed(context, '/addroom');
                               },
                             ),
                           ],

@@ -1,4 +1,5 @@
 import 'package:autosched/screens/setup_manager_screen/rooms/add_rooms/add_room_controller.dart';
+import 'package:autosched/screens/setup_manager_screen/rooms/room_controller.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,6 +14,7 @@ class AddRoomsScreen extends StatefulWidget {
 
 class _AddRoomsScreenState extends State<AddRoomsScreen> {
   String? selectedRoomType;
+  final _rommController = Get.put(RoomController());
   final _roomNumberController = TextEditingController();
   final _roomNameController = TextEditingController();
   final _roomDescriptionController = TextEditingController();
@@ -330,17 +332,29 @@ class _AddRoomsScreenState extends State<AddRoomsScreen> {
   }
 
   Future<void> _saveRoom() async {
+    if (_roomNumberController.text.isEmpty ||
+        _roomNameController.text.isEmpty ||
+        _roomDescriptionController.text.isEmpty) {
+      Get.snackbar('Error', 'Please fill in all fields');
+      return;
+    }
+
     await _controller.addRoom(
       roomNumber: _roomNumberController.text,
       roomName: _roomNameController.text,
       roomType: selectedRoomType!,
       description: _roomDescriptionController.text,
     );
-    if (_controller.isSuccess == true) {
+    if (_controller.isSuccess) {
       _roomNumberController.clear();
       _roomNameController.clear();
       _roomDescriptionController.clear();
       selectedRoomType = null;
+      await _rommController.fetchRooms();
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacementNamed(context, '/setup-manager/rooms');
+    } else {
+      Get.snackbar('Failed', _controller.errorMessage);
     }
   }
 }

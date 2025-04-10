@@ -30,9 +30,9 @@ class EditProfileController extends GetxController {
         return;
       }
 
-      final response = await _connect.get(
-        'http://localhost/autosched/backend_php/api/get_current_user.php',
-        query: {'user_id': userId},
+      final response = await _connect.post(
+        'http://localhost/autosched/backend_php/api/get_row.php?table_name=users',
+        {'user_id': userId},
       );
       // log(response.body);r
 
@@ -43,7 +43,7 @@ class EditProfileController extends GetxController {
 
       final data = response.body;
       if (data['status'] == 'success') {
-        _currentUser.value = data['user'];
+        _currentUser.value = data['data'][0];
         _isSuccess.value = true;
         // log('User logged in: ${response.body}');
       } else {

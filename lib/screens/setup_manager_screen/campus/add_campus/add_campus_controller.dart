@@ -20,11 +20,14 @@ class AddCampusController extends GetxController {
 
     try {
       final response = await GetConnect().post(
-        'http://localhost/autosched/backend_php/api/add_campus.php',
+        'http://localhost/autosched/backend_php/api/add_row.php',
         {
-          'campus_name': campusName,
-          'campus_type': campusType,
-          'address': address,
+          "table_name": "campus_list",
+          "columns": {
+            "campus_name": campusName,
+            "campus_type": campusType,
+            "address": address,
+          },
         },
       );
 

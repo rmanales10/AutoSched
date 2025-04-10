@@ -18,8 +18,11 @@ class AddSubjectController extends GetxController {
     required String mode,
   }) async {
     try {
-      final response = await _connect
-          .post('http://localhost/autosched/backend_php/api/add_subject.php', {
+      final response = await _connect.post(
+        'http://localhost/autosched/backend_php/api/add_row.php',
+        {
+          'table_name': 'subjects',
+          'columns': {
             'subject_code': subjectCode,
             'descriptive_title': descriptiveTitle,
             'lec': lec,
@@ -32,7 +35,9 @@ class AddSubjectController extends GetxController {
             'program': program,
             'major': major,
             'mode': mode,
-          });
+          },
+        },
+      );
 
       if (response.status.hasError) {
         throw Exception('Failed to add subject');

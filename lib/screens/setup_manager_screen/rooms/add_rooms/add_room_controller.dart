@@ -32,14 +32,19 @@ class AddRoomController extends GetxController {
       return;
     }
 
-    final response = await _connect
-        .post('http://localhost/autosched/backend_php/api/add_rooms.php', {
+    final response = await _connect.post(
+      'http://localhost/autosched/backend_php/api/add_row.php',
+      {
+        'table_name': 'rooms',
+        'columns': {
           'user_id': userId,
           'room_number': roomNumber,
           'room_name': roomName,
           'room_type': roomType,
           'description': description,
-        });
+        },
+      },
+    );
 
     _isLoading.value = false;
 

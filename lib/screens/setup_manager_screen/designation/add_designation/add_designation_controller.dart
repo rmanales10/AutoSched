@@ -22,11 +22,14 @@ class AddDesignationController extends GetxController {
 
     try {
       final response = await _connect.post(
-        'http://localhost/autosched/backend_php/api/add_designation.php',
+        'http://localhost/autosched/backend_php/api/add_row.php',
         {
-          'designation': designation,
-          'office_or_department': officeOrDepartment,
-          'time_release': timeRelease,
+          'table_name': 'designation_list',
+          'columns': {
+            'designation': designation,
+            'office_or_department': officeOrDepartment,
+            'time_release': timeRelease,
+          },
         },
       );
 
