@@ -26,21 +26,23 @@ class TeachingLoadController extends GetxController {
     try {
       final userId = _storage.read('user_id');
       final Map<String, dynamic> data = {
-        'user_id': userId,
-        'semester': semester,
-        'program': program,
-        'major': major,
-        '1st_year': year1,
-        '2nd_year': year2,
-        '3rd_year': year3,
-        '4th_year': year4,
+        'table_name': 'teaching_load_list',
+        'columns': {
+          'user_id': userId,
+          'semester': semester,
+          'program': program,
+          'major': major,
+          '1st_year': year1,
+          '2nd_year': year2,
+          '3rd_year': year3,
+          '4th_year': year4,
+        },
       };
 
       final response = await _connect.post(
-        'http://localhost/autosched/backend_php/api/create_teaching_load.php',
+        'http://localhost/autosched/backend_php/api/add_row.php',
         data,
       );
-      
 
       if (response.status.hasError) {
         _errorMessage.value = 'Server error occurred';

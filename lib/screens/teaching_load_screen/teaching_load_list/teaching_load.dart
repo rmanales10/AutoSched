@@ -98,11 +98,13 @@ class _TeachingLoadScreenState extends State<TeachingLoadScreen> {
       ),
     ];
 
-    return SingleChildScrollView(
-      child: Column(
-        children: List.generate(teachingLoadData.length, (index) {
-          return _buildRow(teachingLoadData[index], index);
-        }),
+    return Expanded(
+      child: SingleChildScrollView(
+        child: Column(
+          children: List.generate(teachingLoadData.length, (index) {
+            return _buildRow(teachingLoadData[index], index);
+          }),
+        ),
       ),
     );
   }

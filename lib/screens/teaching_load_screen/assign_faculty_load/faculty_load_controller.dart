@@ -108,10 +108,14 @@ class FacultyLoadController extends GetxController {
     String section,
   ) async {
     try {
-      final response = await _connect.post(
-        'http://localhost/autosched/backend_php/api/update_faculty_load.php',
-        {'load_id': loadId, 'faculty': faculty, 'section': section},
-      );
+      final response = await _connect
+          .post('http://localhost/autosched/backend_php/api/update_row.php', {
+            'table_name': 'faculty_load',
+            'id_column': 'load_id',
+            'id_value': loadId,
+            'faculty': faculty,
+            'section': section,
+          });
 
       if (response.status.hasError) {
         throw Exception('Failed to update faculty load');
