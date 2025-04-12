@@ -12,7 +12,6 @@ class SubjectsListScreen extends GetView<SubjectListController> {
     required this.selectedItem,
     required this.onItemSelected,
   }) {
-    // Use Get.put() to instantiate and register the controller
     Get.put(SubjectListController());
   }
 
@@ -66,16 +65,6 @@ class SubjectsListScreen extends GetView<SubjectListController> {
                               ),
                               onPressed: () {
                                 Get.toNamed('/addsubject');
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.delete,
-                                color: Color.fromARGB(255, 243, 20, 4),
-                                size: 50,
-                              ),
-                              onPressed: () {
-                                // Delete Action
                               },
                             ),
                           ],
@@ -201,6 +190,16 @@ Widget _actionIcons(String subjectId) {
         icon: const Icon(Icons.edit, color: Colors.green, size: 40),
         onPressed: () {
           Get.toNamed('/editsubject', arguments: subjectId);
+        },
+      ),
+      IconButton(
+        icon: const Icon(
+          Icons.delete,
+          color: Color.fromARGB(255, 243, 20, 4),
+          size: 50,
+        ),
+        onPressed: () {
+          // Delete Action
         },
       ),
     ],

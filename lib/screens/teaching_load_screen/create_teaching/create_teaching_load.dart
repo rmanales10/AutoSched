@@ -1,6 +1,5 @@
 import 'package:autosched/screens/teaching_load_screen/create_teaching/teaching_load_controller.dart';
 import 'package:autosched/screens/teaching_load_screen/teaching_load_list/view_load_controller.dart';
-import 'package:autosched/screens/teaching_load_screen/view_teaching_load.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

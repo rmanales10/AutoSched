@@ -1,4 +1,5 @@
-import 'package:autosched/screens/setup_manager_screen/faculty/faculty_controller.dart';
+import 'package:autosched/screens/setup_manager_screen/faculty/edit_faculty/edit_faculty.dart';
+import 'package:autosched/screens/setup_manager_screen/faculty/faculty_screen/faculty_controller.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -156,7 +157,16 @@ class _FacultyScreenState extends State<FacultyScreen> {
           Expanded(flex: 2, child: _rowText(values[3], isHeader)), // Department
           Expanded(
             flex: 2,
-            child: isHeader ? _rowText(values[4], isHeader) : _actionIcons(),
+            child:
+                isHeader
+                    ? _rowText(values[4], isHeader)
+                    : _actionIcons(
+                      values[0],
+                      values[1],
+                      values[2],
+                      values[3],
+                      values[4],
+                    ),
           ), // Actions
         ],
       ),
@@ -175,7 +185,13 @@ class _FacultyScreenState extends State<FacultyScreen> {
   }
 
   // Actions Column Icons (Only for data rows)
-  Widget _actionIcons() {
+  Widget _actionIcons(
+    String id,
+    String firstName,
+    String lastName,
+    String email,
+    String phone,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -185,15 +201,17 @@ class _FacultyScreenState extends State<FacultyScreen> {
             color: Colors.green,
             size: 40,
           ),
-          onPressed: () {
-            // View Faculty Action
-          },
+          onPressed: () => Navigator.pushNamed(context, '/view-faculty'),
         ),
         IconButton(
           icon: const Icon(Icons.edit, color: Colors.green, size: 40),
-          onPressed: () {
-            // Edit Faculty Action
-          },
+          onPressed:
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditFacultyScreen(id: int.parse(id)),
+                ),
+              ),
         ),
       ],
     );

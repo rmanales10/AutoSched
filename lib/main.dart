@@ -16,8 +16,9 @@ import 'package:autosched/screens/setup_manager_screen/designation/add_designati
 import 'package:autosched/screens/setup_manager_screen/designation/designation_list/designation_list.dart';
 import 'package:autosched/screens/setup_manager_screen/designation/viewdesignation.dart';
 import 'package:autosched/screens/setup_manager_screen/faculty/add_faculty/addfaculty.dart';
+import 'package:autosched/screens/setup_manager_screen/faculty/viewfaculty.dart';
 import 'package:autosched/screens/setup_manager_screen/rooms/add_rooms/addroom.dart';
-import 'package:autosched/screens/setup_manager_screen/faculty/faculty.dart';
+import 'package:autosched/screens/setup_manager_screen/faculty/faculty_screen/faculty.dart';
 import 'package:autosched/screens/setup_manager_screen/rooms/editroom.dart';
 import 'package:autosched/screens/setup_manager_screen/rooms/room_list.dart';
 import 'package:autosched/screens/setup_manager_screen/rooms/viewroom.dart';
@@ -60,6 +61,7 @@ class MyApp extends StatelessWidget {
         '/teaching-load': (context) => const TeachingLoadScreen(),
         '/create_teaching-load': (context) => CreateTeachingLoadScreen(),
         '/assign-faculty-load': (context) => AssignFacultyLoadScreen(),
+        '/view-faculty': (context) => ViewFacultyScreen(),
         '/setup-manager/faculty':
             (context) => FacultyScreen(
               selectedItem: 'Faculty',

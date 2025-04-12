@@ -1,5 +1,5 @@
 import 'package:autosched/screens/setup_manager_screen/designation/designation_list/designation_list_controller.dart';
-import 'package:autosched/screens/setup_manager_screen/designation/editdesignation.dart';
+import 'package:autosched/screens/setup_manager_screen/designation/edit_designation/editdesignation.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

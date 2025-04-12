@@ -1,5 +1,8 @@
+import 'package:autosched/screens/setup_manager_screen/designation/designation_list/designation_list_controller.dart';
+import 'package:autosched/screens/setup_manager_screen/designation/edit_designation/edit_designation_controller.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class EditDesignationScreen extends StatefulWidget {
   final String id;
@@ -23,6 +26,8 @@ class _EditDesignationScreenState extends State<EditDesignationScreen> {
   final _designationController = TextEditingController();
   final _departmentController = TextEditingController();
   final _timeController = TextEditingController();
+  final _controller = Get.put(EditDesignationController());
+  final _designationListController = Get.put(DesignationListController());
 
   @override
   void initState() {
@@ -257,10 +262,7 @@ class _EditDesignationScreenState extends State<EditDesignationScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        // Add save logic here
-                      },
+                      onTap: () => saveChanges(),
                       child: Container(
                         width: 120,
                         height: 30,
@@ -316,5 +318,22 @@ class _EditDesignationScreenState extends State<EditDesignationScreen> {
         );
       },
     );
+  }
+
+  Future<void> saveChanges() async {
+    await _controller.editDesignation(
+      id: int.parse(widget.id),
+      designation: _designationController.text,
+      officeDepartment: _departmentController.text,
+      time: _timeController.text,
+    );
+    if (_controller.isSuccess) {
+      Get.snackbar('Success', 'Designation saved successfully');
+      await _designationListController.fetchDesignations();
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacementNamed(context, '/setup-manager/designation');
+    } else {
+      Get.snackbar('Failed', _controller.errorMessage);
+    }
   }
 }
