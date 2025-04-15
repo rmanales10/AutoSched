@@ -1,30 +1,51 @@
-import 'package:autosched/screens/setup_manager_screen/rooms/add_rooms/add_room_controller.dart';
+import 'package:autosched/screens/setup_manager_screen/rooms/edit_room/edit_room_controller.dart';
 import 'package:autosched/screens/setup_manager_screen/rooms/room/room_controller.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class AddRoomsScreen extends StatefulWidget {
-  const AddRoomsScreen({super.key});
+class EditRoomScreen extends StatefulWidget {
+  final String roomId;
+  final String roomNumber;
+  final String roomName;
+  final String roomType;
+  final String descriptive;
+  const EditRoomScreen({
+    super.key,
+    required this.roomId,
+    required this.roomNumber,
+    required this.roomName,
+    required this.roomType,
+    required this.descriptive,
+  });
 
   @override
-  // ignore: library_private_types_in_public_api
-  _AddRoomsScreenState createState() => _AddRoomsScreenState();
+  _EditRoomScreenState createState() => _EditRoomScreenState();
 }
 
-class _AddRoomsScreenState extends State<AddRoomsScreen> {
-  String? selectedRoomType;
-  final _rommController = Get.put(RoomController());
+class _EditRoomScreenState extends State<EditRoomScreen> {
+  final _roomController = Get.put(RoomController());
+  final _controller = Get.put(EditRoomController());
   final _roomNumberController = TextEditingController();
   final _roomNameController = TextEditingController();
-  final _roomDescriptionController = TextEditingController();
-  final _controller = Get.put(AddRoomController());
+  final _descriptiveController = TextEditingController();
+  String? selectedRoomType;
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      _roomNumberController.text = widget.roomNumber;
+      _roomNameController.text = widget.roomName;
+      _descriptiveController.text = widget.descriptive;
+      selectedRoomType = widget.roomType;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double inputFontSize = screenWidth < 600 ? 14 : 18;
-    double textFieldWidth = screenWidth > 1200 ? 350 : screenWidth * 0.3;
+    double textFieldWidth = screenWidth > 1200 ? 380 : screenWidth * 0.3;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
@@ -57,7 +78,7 @@ class _AddRoomsScreenState extends State<AddRoomsScreen> {
                       children: [
                         const SizedBox(height: 20),
                         const Text(
-                          "Add Rooms",
+                          "Edit Room",
                           style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
@@ -102,7 +123,7 @@ class _AddRoomsScreenState extends State<AddRoomsScreen> {
     return Column(
       children: [
         Wrap(
-          spacing: 20,
+          spacing: 50,
           runSpacing: 30,
           children: [
             _buildTextField(
@@ -117,7 +138,7 @@ class _AddRoomsScreenState extends State<AddRoomsScreen> {
               "Add Description",
               fontSize,
               width,
-              _roomDescriptionController,
+              _descriptiveController,
             ),
           ],
         ),
@@ -167,9 +188,10 @@ class _AddRoomsScreenState extends State<AddRoomsScreen> {
         ),
         child: DropdownButtonHideUnderline(
           child: DropdownButton<String>(
+            borderRadius: BorderRadius.circular(30),
             hint: Text(
               "Room Type",
-              style: TextStyle(fontSize: fontSize, color: Colors.grey.shade600),
+              style: TextStyle(fontSize: fontSize, color: Colors.black),
             ),
             value: selectedRoomType,
             icon: Icon(
@@ -186,8 +208,7 @@ class _AddRoomsScreenState extends State<AddRoomsScreen> {
                           type,
                           style: TextStyle(
                             fontSize: fontSize,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade600,
+                            color: Colors.black,
                           ),
                         ),
                       ),
@@ -208,7 +229,7 @@ class _AddRoomsScreenState extends State<AddRoomsScreen> {
     String hint,
     double fontSize,
     double width,
-    TextEditingController controller,
+    TextEditingController? controller,
   ) {
     return SizedBox(
       width: width,
@@ -229,10 +250,7 @@ class _AddRoomsScreenState extends State<AddRoomsScreen> {
             ),
             border: InputBorder.none,
             hintText: hint,
-            hintStyle: TextStyle(
-              fontSize: fontSize,
-              color: Colors.grey.shade600,
-            ),
+            hintStyle: TextStyle(fontSize: fontSize, color: Colors.black),
           ),
         ),
       ),
@@ -270,10 +288,7 @@ class _AddRoomsScreenState extends State<AddRoomsScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        _saveRoom();
-                        Get.back(canPop: true);
-                      },
+                      onTap: () => _saveChanges(),
                       child: Container(
                         width: 120,
                         height: 30,
@@ -331,30 +346,15 @@ class _AddRoomsScreenState extends State<AddRoomsScreen> {
     );
   }
 
-  Future<void> _saveRoom() async {
-    if (_roomNumberController.text.isEmpty ||
-        _roomNameController.text.isEmpty ||
-        _roomDescriptionController.text.isEmpty) {
-      Get.snackbar('Error', 'Please fill in all fields');
-      return;
-    }
-
-    await _controller.addRoom(
+  Future<void> _saveChanges() async {
+    _controller.editRoom(
+      id: int.parse(widget.roomId),
       roomNumber: _roomNumberController.text,
       roomName: _roomNameController.text,
       roomType: selectedRoomType!,
-      description: _roomDescriptionController.text,
+      description: _descriptiveController.text,
     );
-    if (_controller.isSuccess) {
-      _roomNumberController.clear();
-      _roomNameController.clear();
-      _roomDescriptionController.clear();
-      selectedRoomType = null;
-      await _rommController.fetchRooms();
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacementNamed(context, '/setup-manager/rooms');
-    } else {
-      Get.snackbar('Failed', _controller.errorMessage);
-    }
+    Navigator.pushNamed(context, '/setup-manager/rooms');
+    await _roomController.fetchRooms();
   }
 }

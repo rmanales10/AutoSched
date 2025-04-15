@@ -1,14 +1,37 @@
+import 'package:autosched/screens/setup_manager_screen/campus/edit_campus/edit_campus.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 
 class ViewCampusScreen extends StatefulWidget {
-  const ViewCampusScreen({super.key});
+  final String campusId;
+  final String campusName;
+  final String campusType;
+  final String address;
+  const ViewCampusScreen({
+    super.key,
+    required this.campusId,
+    required this.campusName,
+    required this.campusType,
+    required this.address,
+  });
 
   @override
   _ViewCampusScreenState createState() => _ViewCampusScreenState();
 }
 
 class _ViewCampusScreenState extends State<ViewCampusScreen> {
+  final _campusNameController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _campusTypeController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _campusNameController.text = widget.campusName;
+    _addressController.text = widget.address;
+    _campusTypeController.text = widget.campusType;
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -62,9 +85,19 @@ class _ViewCampusScreenState extends State<ViewCampusScreen> {
                               "Edit",
                               const Color.fromARGB(255, 1, 0, 66),
                               Colors.white,
-                              onTap: () {
-                                Navigator.pushNamed(context, '/editcampus');
-                              },
+                              onTap:
+                                  () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => EditCampusScreen(
+                                            campusId: widget.campusId,
+                                            campusName: widget.campusName,
+                                            campusType: widget.campusType,
+                                            campusAddress: widget.address,
+                                          ),
+                                    ),
+                                  ),
                             ),
                             const SizedBox(width: 20),
                             _buildButton(
@@ -96,16 +129,31 @@ class _ViewCampusScreenState extends State<ViewCampusScreen> {
           spacing: 50,
           runSpacing: 30,
           children: [
-            _buildTextField("Campus Name", fontSize, width),
-            _buildTextField("Campus Type", fontSize, width),
-            _buildTextField("Address", fontSize, width),
+            _buildTextField(
+              "Campus Name",
+              fontSize,
+              width,
+              _campusNameController,
+            ),
+            _buildTextField(
+              "Campus Type",
+              fontSize,
+              width,
+              _campusTypeController,
+            ),
+            _buildTextField("Address", fontSize, width, _addressController),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildTextField(String hint, double fontSize, double width) {
+  Widget _buildTextField(
+    String hint,
+    double fontSize,
+    double width,
+    TextEditingController controller,
+  ) {
     return SizedBox(
       width: width,
       child: Container(
@@ -116,6 +164,8 @@ class _ViewCampusScreenState extends State<ViewCampusScreen> {
           border: Border.all(width: 1, color: Colors.grey.shade300),
         ),
         child: TextField(
+          enabled: false,
+          controller: controller,
           style: TextStyle(fontSize: fontSize),
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(

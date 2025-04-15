@@ -42,6 +42,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' || $_SERVER['REQUEST_METHOD'] === 'POST
             $query = "SELECT * FROM $table_name WHERE user_id = :user_id";
             $stmt = $conn->prepare($query);
             $stmt->bindParam(':user_id', $user_id);
+        } elseif ($column_name !== null && $value !== null) {
+            $query = "SELECT * FROM $table_name WHERE $column_name = :value";
+            $stmt = $conn->prepare($query);
+            $stmt->bindParam(':value', $value);
         } else {
             $query = "SELECT * FROM $table_name";
             $stmt = $conn->prepare($query);

@@ -2,8 +2,8 @@ import 'package:autosched/screens/auth_screens/forgot_password.dart';
 import 'package:autosched/screens/auth_screens/login/login.dart';
 import 'package:autosched/screens/auth_screens/register/register.dart';
 import 'package:autosched/screens/curriculum_screen/addsub.dart';
-import 'package:autosched/screens/curriculum_screen/create_curriculum.dart';
-import 'package:autosched/screens/curriculum_screen/curriculum_list.dart';
+import 'package:autosched/screens/curriculum_screen/create_curriculum/create_curriculum.dart';
+import 'package:autosched/screens/curriculum_screen/curriculum_list/curriculum_list.dart';
 import 'package:autosched/screens/curriculum_screen/curriculum_load.dart';
 import 'package:autosched/screens/home_screen/home.dart';
 import 'package:autosched/screens/profile_screen/edit_profile/edit_profile.dart';
@@ -11,7 +11,6 @@ import 'package:autosched/screens/profile_screen/profile/profile.dart';
 import 'package:autosched/screens/schedule_screen/generated_schedule.dart';
 import 'package:autosched/screens/setup_manager_screen/campus/add_campus/add_campus.dart';
 import 'package:autosched/screens/setup_manager_screen/campus/campust_list/campus_list.dart';
-import 'package:autosched/screens/setup_manager_screen/campus/view_campus.dart';
 import 'package:autosched/screens/setup_manager_screen/designation/add_designation/add_designation.dart';
 import 'package:autosched/screens/setup_manager_screen/designation/designation_list/designation_list.dart';
 import 'package:autosched/screens/setup_manager_screen/designation/viewdesignation.dart';
@@ -19,11 +18,10 @@ import 'package:autosched/screens/setup_manager_screen/faculty/add_faculty/addfa
 import 'package:autosched/screens/setup_manager_screen/faculty/viewfaculty.dart';
 import 'package:autosched/screens/setup_manager_screen/rooms/add_rooms/addroom.dart';
 import 'package:autosched/screens/setup_manager_screen/faculty/faculty_screen/faculty.dart';
-import 'package:autosched/screens/setup_manager_screen/rooms/editroom.dart';
-import 'package:autosched/screens/setup_manager_screen/rooms/room_list.dart';
+import 'package:autosched/screens/setup_manager_screen/rooms/edit_room/edit_room.dart';
+import 'package:autosched/screens/setup_manager_screen/rooms/room/room_list.dart';
 import 'package:autosched/screens/setup_manager_screen/rooms/viewroom.dart';
 import 'package:autosched/screens/setup_manager_screen/subject/add_subject/add_subject.dart';
-import 'package:autosched/screens/setup_manager_screen/subject/editsubject.dart';
 import 'package:autosched/screens/setup_manager_screen/subject/subject_list/subjects_list.dart';
 import 'package:autosched/screens/setup_manager_screen/subject/viewsubject.dart';
 import 'package:autosched/screens/teaching_load_screen/assign_faculty_load/assign_faculty_load.dart';
@@ -106,16 +104,15 @@ class MyApp extends StatelessWidget {
         '/curriculum-load': (context) => const CurriculumLoadScreen(),
         '/addsubcur': (context) => const AddSubjectCurScreen(),
         '/addcampus': (context) => const AddCampusScreen(),
-        '/viewcampus': (context) => const ViewCampusScreen(),
+        // '/viewcampus': (context) => const ViewCampusScreen(),
         // '/editcampus': (context) => const EditCampusScreen(),
         '/adddesignation': (context) => const AddDesignationScreen(),
         '/viewdesignation': (context) => const ViewDesignationScreen(),
         // '/editdesignation': (context) => const EditDesignationScreen(),
         '/viewroom': (context) => const ViewRoomScreen(),
-        '/editroom': (context) => const EditRoomScreen(),
+        // '/editroom': (context) => const EditRoomScreen(),
         '/addsubject': (context) => const AddSubjectScreen(),
         '/viewsubject': (context) => const ViewSubjectScreen(),
-        '/editsubject': (context) => const EditSubjectScreen(),
       },
     );
   }

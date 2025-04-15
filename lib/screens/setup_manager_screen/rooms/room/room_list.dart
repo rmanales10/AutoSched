@@ -1,19 +1,31 @@
-import 'package:autosched/screens/setup_manager_screen/subject/edit_subject/edit_subject.dart';
-import 'package:autosched/screens/setup_manager_screen/subject/subject_list/subject_list_controller.dart';
+import 'package:autosched/screens/setup_manager_screen/rooms/edit_room/edit_room.dart';
+import 'package:autosched/screens/setup_manager_screen/rooms/room/room_controller.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class SubjectsListScreen extends GetView<SubjectListController> {
+class RoomScreen extends StatefulWidget {
   final String selectedItem;
   final Function(String, String) onItemSelected;
 
-  SubjectsListScreen({
+  const RoomScreen({
     super.key,
     required this.selectedItem,
     required this.onItemSelected,
-  }) {
-    Get.put(SubjectListController());
+  });
+
+  @override
+  _RoomScreenState createState() => _RoomScreenState();
+}
+
+class _RoomScreenState extends State<RoomScreen> {
+  late String selectedItem;
+  final RoomController roomController = Get.put(RoomController());
+
+  @override
+  void initState() {
+    super.initState();
+    selectedItem = widget.selectedItem;
   }
 
   @override
@@ -21,15 +33,23 @@ class SubjectsListScreen extends GetView<SubjectListController> {
     return Scaffold(
       body: Row(
         children: [
-          Sidebar(selectedItem: selectedItem, onItemSelected: onItemSelected),
+          Sidebar(
+            selectedItem: selectedItem,
+            onItemSelected: (title, route) {
+              setState(() {
+                selectedItem = title;
+              });
+              Navigator.pushNamed(context, route);
+            },
+          ),
           Expanded(
             child: Container(
-              color: const Color(0xFFF9F9F9),
               padding: const EdgeInsets.symmetric(horizontal: 40),
+              color: const Color(0xFFF9F9F9),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header Section
+                  // Header Section (No Extra Top Padding)
                   Padding(
                     padding: const EdgeInsets.only(
                       top: 30,
@@ -40,7 +60,7 @@ class SubjectsListScreen extends GetView<SubjectListController> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          'SUBJECTS LIST',
+                          'ROOM LIST',
                           style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
@@ -54,18 +74,16 @@ class SubjectsListScreen extends GetView<SubjectListController> {
                                 color: Colors.green,
                                 size: 50,
                               ),
-                              onPressed: () {
-                                // Print Action
-                              },
+                              onPressed: () {},
                             ),
                             IconButton(
                               icon: const Icon(
                                 Icons.note_add_rounded,
-                                color: Color.fromARGB(255, 1, 0, 66),
+                                color: Color(0xFF010042),
                                 size: 50,
                               ),
                               onPressed: () {
-                                Get.toNamed('/addsubject');
+                                Navigator.pushNamed(context, '/addroom');
                               },
                             ),
                           ],
@@ -74,22 +92,22 @@ class SubjectsListScreen extends GetView<SubjectListController> {
                     ),
                   ),
                   const SizedBox(height: 30),
-
+                  // Room List (No Extra Bottom Padding)
                   Expanded(
                     child: Obx(() {
-                      if (controller.isLoading.value) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (controller.errorMessage.isNotEmpty) {
+                      if (roomController.isLoading.value) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (roomController.errorMessage.isNotEmpty) {
                         return Center(
-                          child: Text(controller.errorMessage.value),
+                          child: Text(roomController.errorMessage.value),
                         );
                       } else {
                         return SingleChildScrollView(
                           child: Column(
                             children: [
-                              _buildHeaderRow(context),
-                              ...controller.subjects.map(
-                                (subject) => _buildRow(context, subject),
+                              _buildHeaderRow(),
+                              ...roomController.rooms.map(
+                                (room) => _buildRow(room),
                               ),
                             ],
                           ),
@@ -106,66 +124,58 @@ class SubjectsListScreen extends GetView<SubjectListController> {
     );
   }
 
-  Widget _buildHeaderRow(BuildContext context) {
-    return _buildRow(context, {
-      'id': 'ID',
-      'subject_code': 'SUBJECT CODE',
-      'descriptive_title': 'DESCRIPTIVE TITLE',
-      'lec': 'LEC',
-      'lab': 'LAB',
-      'credit': 'CREDIT',
+  Widget _buildHeaderRow() {
+    return _buildRow({
+      'room_id': 'ID',
+      'room_number': 'ROOM NUMBER',
+      'room_name': 'ROOM NAME',
+      'room_type': 'ROOM TYPE',
       'actions': 'ACTIONS',
     }, isHeader: true);
   }
 
-  Widget _buildRow(
-    BuildContext context,
-    Map<String, dynamic> subject, {
-    bool isHeader = false,
-  }) {
+  Widget _buildRow(Map<String, dynamic> values, {bool isHeader = false}) {
+    bool isEvenRow = roomController.rooms.indexOf(values) % 2 == 0;
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
       decoration: BoxDecoration(
         color:
             isHeader
                 ? Colors.white
-                : (subject['id'].hashCode % 2 == 0
-                    ? Colors.white
-                    : Colors.transparent),
+                : (isEvenRow ? Colors.white : Colors.transparent),
         borderRadius: BorderRadius.circular(30),
       ),
       child: Row(
         children: [
           Expanded(
             flex: 1,
-            child: _rowText(subject['id'].toString(), isHeader),
+            child: _rowText(values['room_id'].toString(), isHeader),
           ),
           Expanded(
             flex: 2,
-            child: _rowText(subject['subject_code'].toString(), isHeader),
+            child: _rowText(values['room_number'].toString(), isHeader),
           ),
           Expanded(
-            flex: 4,
-            child: _rowText(subject['descriptive_title'], isHeader),
+            flex: 3,
+            child: _rowText(values['room_name'] ?? '', isHeader),
           ),
           Expanded(
-            flex: 1,
-            child: _rowText(subject['lec'].toString(), isHeader),
-          ),
-          Expanded(
-            flex: 1,
-            child: _rowText(subject['lab'].toString(), isHeader),
-          ),
-          Expanded(
-            flex: 1,
-            child: _rowText(subject['credit'].toString(), isHeader),
+            flex: 2,
+            child: _rowText(values['room_type'] ?? '', isHeader),
           ),
           Expanded(
             flex: 2,
             child:
                 isHeader
-                    ? _rowText('ACTIONS', isHeader)
-                    : _actionIcons(context, subject['id'].toString()),
+                    ? _rowText(values['actions'], isHeader)
+                    : _actionIcons(
+                      values['room_id'].toString(),
+                      values['room_number'].toString(),
+                      values['room_name'] ?? '',
+                      values['room_type'] ?? '',
+                      values['description'] ?? '',
+                    ),
           ),
         ],
       ),
@@ -183,7 +193,13 @@ class SubjectsListScreen extends GetView<SubjectListController> {
     );
   }
 
-  Widget _actionIcons(BuildContext context, String subjectId) {
+  Widget _actionIcons(
+    String roomId,
+    String roomNumber,
+    String roomName,
+    String roomType,
+    String descriptive,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -194,7 +210,7 @@ class SubjectsListScreen extends GetView<SubjectListController> {
             size: 40,
           ),
           onPressed: () {
-            Get.toNamed('/viewsubject', arguments: subjectId);
+            Navigator.pushNamed(context, '/viewroom');
           },
         ),
         IconButton(
@@ -203,7 +219,14 @@ class SubjectsListScreen extends GetView<SubjectListController> {
               () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EditSubjectScreen(id: subjectId),
+                  builder:
+                      (context) => EditRoomScreen(
+                        roomId: roomId,
+                        roomNumber: roomNumber,
+                        roomName: roomName,
+                        roomType: roomType,
+                        descriptive: descriptive,
+                      ),
                 ),
               ),
         ),
@@ -213,9 +236,7 @@ class SubjectsListScreen extends GetView<SubjectListController> {
             color: Color.fromARGB(255, 243, 20, 4),
             size: 50,
           ),
-          onPressed: () {
-            // Delete Action
-          },
+          onPressed: () {},
         ),
       ],
     );

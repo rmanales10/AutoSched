@@ -1,5 +1,6 @@
 import 'package:autosched/screens/setup_manager_screen/campus/campust_list/campust_list_controller.dart';
 import 'package:autosched/screens/setup_manager_screen/campus/edit_campus/edit_campus.dart';
+import 'package:autosched/screens/setup_manager_screen/campus/view_campus.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -173,7 +174,18 @@ class _CampusListScreenState extends State<CampusListScreen> {
             size: 40,
           ),
           onPressed: () {
-            Navigator.pushNamed(context, '/viewcampus');
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => ViewCampusScreen(
+                      campusId: campusId,
+                      campusName: campusName,
+                      campusType: campusType,
+                      address: address,
+                    ),
+              ),
+            );
           },
         ),
         IconButton(

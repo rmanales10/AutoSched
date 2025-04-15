@@ -1,14 +1,61 @@
+import 'package:autosched/screens/setup_manager_screen/subject/edit_subject/edit_subject_controller.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class EditSubjectScreen extends StatefulWidget {
-  const EditSubjectScreen({super.key});
+  final String id;
+  const EditSubjectScreen({super.key, required this.id});
 
   @override
   _EditSubjectScreenState createState() => _EditSubjectScreenState();
 }
 
 class _EditSubjectScreenState extends State<EditSubjectScreen> {
+  final _controller = Get.put(EditSubjectController());
+  String? selectedSubjectArea;
+  String? selectedGradeLevel;
+  String? selectedMajor;
+  String? selectedMode;
+  String? selectedProgram;
+  final _subjectCodeController = TextEditingController();
+  final _descriptiveTitleController = TextEditingController();
+  final _labHoursController = TextEditingController();
+  final _labUnitController = TextEditingController();
+  final _lectHoursController = TextEditingController();
+  final _lecUnitController = TextEditingController();
+  final _creditController = TextEditingController();
+  final subjectArea = ['IT', 'CS', 'Engineering'];
+  final yearLevel = ['1st Year', '2nd Year'];
+  final program = ['Full-Time', 'Part-Time'];
+  final major = ['Computer Science', 'Information Technology', 'Engineering'];
+  final mode = ['Online', 'On-site'];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchSubjects();
+  }
+
+  Future<void> fetchSubjects() async {
+    await _controller.fetchSubject(widget.id);
+    final data = _controller.subjects[0];
+    setState(() {
+      _subjectCodeController.text = data['subject_code'];
+      _descriptiveTitleController.text = data['descriptive_title'];
+      _labHoursController.text = data['lab_hrs'];
+      _labUnitController.text = data['lab'].toString();
+      _lectHoursController.text = data['lec_hrs'];
+      _lecUnitController.text = data['lec'].toString();
+      _creditController.text = data['credit'].toString();
+      selectedSubjectArea = data['subject_area'];
+      selectedGradeLevel = data['year_level'];
+      selectedMajor = data['major'];
+      selectedMode = data['mode'];
+      selectedProgram = data['program'];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -70,7 +117,7 @@ class _EditSubjectScreenState extends State<EditSubjectScreen> {
                             ),
                           ],
                         ),
-                            const SizedBox(height: 20),
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
@@ -90,33 +137,83 @@ class _EditSubjectScreenState extends State<EditSubjectScreen> {
           spacing: 30,
           runSpacing: 30,
           children: [
-            _buildTextField("Input subject code", fontSize, width),
-            _buildTextField("Lab Units", fontSize, width),
-            _buildTextField("Lab HRS", fontSize, width),
-            _buildTextField("Input descriptive title", fontSize, width),
-            _buildTextField("Lec Units", fontSize, width),
-            _buildTextField("Lec HRS", fontSize, width),
-            _buildTextField("Input credit units", fontSize, width),
+            _buildTextField(
+              "Input subject code",
+              fontSize,
+              width,
+              _subjectCodeController,
+            ),
+            _buildTextField("Lab Units", fontSize, width, _labUnitController),
+            _buildTextField("Lab HRS", fontSize, width, _labHoursController),
+            _buildTextField(
+              "Input descriptive title",
+              fontSize,
+              width,
+              _descriptiveTitleController,
+            ),
+            _buildTextField("Lec Units", fontSize, width, _lecUnitController),
+            _buildTextField("Lec HRS", fontSize, width, _lectHoursController),
+            _buildTextField(
+              "Input credit units",
+              fontSize,
+              width,
+              _creditController,
+            ),
             _buildDropdownField(
-              ['IT', 'CS', 'Engineering'],
+              subjectArea,
               'Subject Area',
               fontSize,
               width,
+              selectedSubjectArea,
+              (value) {
+                setState(() {
+                  selectedSubjectArea = value;
+                });
+              },
             ),
             _buildDropdownField(
-              ['1st Year', '2nd Year'],
+              yearLevel,
               'Year Level',
               fontSize,
               width,
+              selectedGradeLevel,
+              (value) {
+                setState(() {
+                  selectedGradeLevel = value;
+                });
+              },
             ),
-            _buildDropdownField(['BSIT', 'BSCS'], 'Program', fontSize, width),
             _buildDropdownField(
-              ['Software', 'Network'],
+              program,
+              'Program',
+              fontSize,
+              width,
+              selectedProgram,
+              (value) {
+                setState(() {
+                  selectedProgram = value;
+                });
+              },
+            ),
+            _buildDropdownField(
+              major,
               'Major',
               fontSize,
               width,
+              selectedMajor,
+              (value) {
+                setState(() {
+                  selectedMajor = value;
+                });
+              },
             ),
-            _buildDropdownField(['Online', 'Hybrid'], 'Mode', fontSize, width),
+            _buildDropdownField(mode, 'Mode', fontSize, width, selectedMode, (
+              value,
+            ) {
+              setState(() {
+                selectedMode = value;
+              });
+            }),
           ],
         ),
       ],
@@ -152,7 +249,12 @@ class _EditSubjectScreenState extends State<EditSubjectScreen> {
     );
   }
 
-  Widget _buildTextField(String hint, double fontSize, double width) {
+  Widget _buildTextField(
+    String hint,
+    double fontSize,
+    double width,
+    TextEditingController? controller,
+  ) {
     return SizedBox(
       width: width,
       child: Container(
@@ -163,6 +265,7 @@ class _EditSubjectScreenState extends State<EditSubjectScreen> {
           border: Border.all(width: 1, color: Colors.grey.shade300),
         ),
         child: TextField(
+          controller: controller,
           cursorColor: Colors.grey[600],
           style: TextStyle(fontSize: fontSize),
           decoration: InputDecoration(
@@ -172,10 +275,7 @@ class _EditSubjectScreenState extends State<EditSubjectScreen> {
             ),
             border: InputBorder.none,
             hintText: hint,
-            hintStyle: TextStyle(
-              fontSize: fontSize,
-              color: Colors.black,
-            ),
+            hintStyle: TextStyle(fontSize: fontSize, color: Colors.black),
           ),
         ),
       ),
@@ -187,60 +287,52 @@ class _EditSubjectScreenState extends State<EditSubjectScreen> {
     String hint,
     double fontSize,
     double width,
+    String? selectedValue,
+    ValueChanged<String?> onChanged,
   ) {
-    String? selectedValue;
+    // Check if selectedValue exists in the items list
+    bool valueExists = selectedValue != null && items.contains(selectedValue);
 
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return SizedBox(
-          width: width,
-          child: Container(
-            height: 50,
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(30),
-              border: Border.all(width: 1, color: Colors.grey.shade300),
+    // Use null if the value doesn't exist in the list
+    String? safeValue = valueExists ? selectedValue : null;
+
+    return SizedBox(
+      width: width,
+      child: Container(
+        height: 50,
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(width: 1, color: Colors.grey.shade300),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            borderRadius: BorderRadius.circular(30),
+            value: safeValue,
+            icon: Icon(
+              Icons.arrow_drop_down_rounded,
+              color: Colors.grey.shade600,
+              size: 24,
             ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                borderRadius: BorderRadius.circular(30),
-                value: selectedValue,
-                icon: Icon(
-                  Icons.arrow_drop_down_rounded,
-                  color: Colors.grey.shade600,
-                  size: 24,
-                ),
-                hint: Text(
-                  hint,
-                  style: TextStyle(
-                    fontSize: fontSize,
-                    color: Colors.black,
-                  ),
-                ),
-                items:
-                    items.map((item) {
-                      return DropdownMenuItem(
-                        value: item,
-                        child: Text(
-                          item,
-                          style: TextStyle(
-                            fontSize: fontSize,
-                            color: Colors.black,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedValue = value;
-                  });
-                },
-              ),
+            hint: Text(
+              hint,
+              style: TextStyle(fontSize: fontSize, color: Colors.black),
             ),
+            items:
+                items.map((item) {
+                  return DropdownMenuItem(
+                    value: item,
+                    child: Text(
+                      item,
+                      style: TextStyle(fontSize: fontSize, color: Colors.black),
+                    ),
+                  );
+                }).toList(),
+            onChanged: onChanged,
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -274,10 +366,7 @@ class _EditSubjectScreenState extends State<EditSubjectScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        // Add save logic here
-                      },
+                      onTap: () => _saveChanges(),
                       child: Container(
                         width: 120,
                         height: 30,
@@ -331,5 +420,26 @@ class _EditSubjectScreenState extends State<EditSubjectScreen> {
         );
       },
     );
+  }
+
+  Future<void> _saveChanges() async {
+    _controller
+        .editSubject(
+          id: widget.id,
+          subjectCode: _subjectCodeController.text,
+          descriptiveTitle: _descriptiveTitleController.text,
+          labHours: _labHoursController.text,
+          labUnit: _labUnitController.text,
+          lectHours: _lectHoursController.text,
+          lecUnit: _lecUnitController.text,
+          credit: _creditController.text,
+          subjectArea: selectedSubjectArea,
+          gradeLevel: selectedGradeLevel,
+          major: selectedMajor,
+          mode: selectedMode,
+          program: selectedProgram,
+        )
+        // ignore: use_build_context_synchronously
+        .then((_) => Navigator.pushNamed(context, '/setup-manager/subjects'));
   }
 }

@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
-class RoomController extends GetxService {
+class RoomController extends GetxController {
   final _connect = GetConnect();
   final _storage = GetStorage();
 
@@ -9,6 +9,12 @@ class RoomController extends GetxService {
   final isLoading = false.obs;
   final errorMessage = ''.obs;
   final isSuccess = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchRooms();
+  }
 
   Future<void> fetchRooms() async {
     isLoading.value = true;
