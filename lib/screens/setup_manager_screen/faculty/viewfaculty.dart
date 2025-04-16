@@ -1,19 +1,52 @@
+import 'package:autosched/screens/setup_manager_screen/faculty/edit_faculty/edit_faculty.dart';
+import 'package:autosched/screens/setup_manager_screen/faculty/edit_faculty/edit_faculty_controller.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class ViewFacultyScreen extends StatefulWidget {
-  const ViewFacultyScreen({super.key});
+class ViewfacultyScreen extends StatefulWidget {
+  final int id;
+
+  const ViewfacultyScreen({super.key, required this.id});
 
   @override
-  _ViewFacultyScreenState createState() => _ViewFacultyScreenState();
+  _ViewfacultyScreenState createState() => _ViewfacultyScreenState();
 }
 
-class _ViewFacultyScreenState extends State<ViewFacultyScreen> {
+class _ViewfacultyScreenState extends State<ViewfacultyScreen> {
   String? selectedPosition;
   String? selectedStatus;
   String? selectedDepartment;
   String? selectedDesignation;
+  String? selectedConstraint;
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _controller = Get.put(EditFacultyController());
   List<bool> constraints = [false, false, false];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+    await _controller.fetchFacultyData(id: widget.id);
+    final data = _controller.facultyData[0];
+    setState(() {
+      selectedPosition = data['position'];
+      selectedStatus = data['status'];
+      selectedDepartment = data['department'];
+      selectedDesignation = data['designation'];
+      selectedConstraint = data['constraints'];
+      _firstNameController.text = data['first_name'];
+      _lastNameController.text = data['last_name'];
+      _emailController.text = data['email'];
+      _phoneController.text = data['mobile_number'];
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +98,13 @@ class _ViewFacultyScreenState extends State<ViewFacultyScreen> {
                               const Color.fromARGB(255, 1, 0, 66),
                               Colors.white,
                               onTap:
-                                  () => Navigator.pushNamed(
+                                  () => Navigator.push(
                                     context,
-                                    '/editfaculty',
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) =>
+                                              EditFacultyScreen(id: widget.id),
+                                    ),
                                   ),
                             ),
                             const SizedBox(width: 20),
@@ -100,12 +137,38 @@ class _ViewFacultyScreenState extends State<ViewFacultyScreen> {
           spacing: 20,
           runSpacing: 30,
           children: [
-            _buildTextField("Name", "Input Name", fontSize, width),
-            _buildTextField("Email", "Input email", fontSize, width),
-            _buildTextField("Mobile Number", "+639...", fontSize, width),
+            _buildTextField(
+              "First Name",
+              "Input First Name",
+              fontSize,
+              width,
+              _firstNameController,
+            ),
+            _buildTextField(
+              "Last Name",
+              "Input Last Name",
+              fontSize,
+              width,
+              _lastNameController,
+            ),
+            _buildTextField(
+              "Email",
+              "Input email",
+              fontSize,
+              width,
+              _emailController,
+            ),
+            _buildTextField(
+              "Mobile Number",
+              "+639...",
+              fontSize,
+              width,
+              _phoneController,
+            ),
+
             _buildDropdownField(
               "Position",
-              "Choose Position",
+              selectedPosition ?? 'Choose Position',
               ["Instructor", "Professor", "Associate Professor"],
               fontSize,
               width,
@@ -117,7 +180,7 @@ class _ViewFacultyScreenState extends State<ViewFacultyScreen> {
             ),
             _buildDropdownField(
               "Status",
-              "Choose Status",
+              selectedStatus ?? "Choose Status",
               ["Full-time", "Part-time", "Visiting"],
               fontSize,
               width,
@@ -129,7 +192,7 @@ class _ViewFacultyScreenState extends State<ViewFacultyScreen> {
             ),
             _buildDropdownField(
               "Department",
-              "Choose Department",
+              selectedDepartment ?? "Choose Department",
               ["BSIT", "BFPT", "BTLED"],
               fontSize,
               width,
@@ -144,7 +207,7 @@ class _ViewFacultyScreenState extends State<ViewFacultyScreen> {
                 Expanded(
                   child: _buildDropdownField(
                     "Designation",
-                    "Choose Designation",
+                    selectedDesignation ?? "Choose Designation",
                     ["Chairperson", "Dean", "Registrar"],
                     fontSize,
                     width,
@@ -155,70 +218,10 @@ class _ViewFacultyScreenState extends State<ViewFacultyScreen> {
                     },
                   ),
                 ),
-                const SizedBox(width: 20),
-                Expanded(
-                  flex: 2,
-                  child: _buildConstraintsSection(fontSize, width),
-                ),
+                Expanded(flex: 2, child: _buildRadioGroup(fontSize, width)),
               ],
             ),
           ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildConstraintsSection(double fontSize, double width) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Constraints",
-          style: TextStyle(
-            fontSize: fontSize,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            _buildConstraintCheckbox("5PM Onwards Only", 0),
-            const SizedBox(width: 30),
-            _buildConstraintCheckbox("Saturday Only", 1),
-            const SizedBox(width: 30),
-            _buildConstraintCheckbox("8AM-5PM Only", 2),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildConstraintCheckbox(String label, int index) {
-    return Row(
-      children: [
-        Transform.scale(
-          scale: 1.5,
-          child: Checkbox(
-            value: constraints[index],
-            onChanged: (value) {
-              setState(() {
-                constraints[index] = value!;
-              });
-            },
-            activeColor: Colors.green,
-            side: BorderSide(color: Colors.green, width: 2),
-          ),
-        ),
-        const SizedBox(width: 5),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 23,
-            fontWeight: FontWeight.bold,
-            color: Color.fromARGB(255, 117, 117, 117),
-          ),
         ),
       ],
     );
@@ -283,7 +286,9 @@ class _ViewFacultyScreenState extends State<ViewFacultyScreen> {
             height: 50,
             padding: const EdgeInsets.symmetric(horizontal: 15),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color:
+                  Colors
+                      .grey[200], // Light grey background to indicate it's disabled
               borderRadius: BorderRadius.circular(30),
               border: Border.all(width: 1, color: Colors.grey.shade300),
             ),
@@ -295,11 +300,11 @@ class _ViewFacultyScreenState extends State<ViewFacultyScreen> {
                   style: TextStyle(
                     fontSize: fontSize,
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey.shade400,
+                    color: Colors.grey.shade600,
                   ),
                 ),
                 value: null,
-                onChanged: onChanged,
+                onChanged: null, // This disables the dropdown
                 items:
                     items.map((item) {
                       return DropdownMenuItem(
@@ -309,15 +314,23 @@ class _ViewFacultyScreenState extends State<ViewFacultyScreen> {
                           style: TextStyle(
                             fontSize: fontSize,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade400,
+                            color: Colors.grey.shade600,
                           ),
                         ),
                       );
                     }).toList(),
                 icon: Icon(
                   Icons.arrow_drop_down_rounded,
-                  color: Colors.grey.shade600,
+                  color: Colors.grey.shade400,
                   size: 24,
+                ),
+                disabledHint: Text(
+                  hint,
+                  style: TextStyle(
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey.shade600,
+                  ),
                 ),
               ),
             ),
@@ -332,6 +345,7 @@ class _ViewFacultyScreenState extends State<ViewFacultyScreen> {
     String hint,
     double fontSize,
     double width,
+    TextEditingController? controller,
   ) {
     return SizedBox(
       width: width,
@@ -358,6 +372,8 @@ class _ViewFacultyScreenState extends State<ViewFacultyScreen> {
               border: Border.all(width: 1, color: Colors.grey.shade300),
             ),
             child: TextField(
+              enabled: false,
+              controller: controller,
               style: TextStyle(fontSize: fontSize),
               decoration: InputDecoration(
                 contentPadding: const EdgeInsets.symmetric(
@@ -376,6 +392,151 @@ class _ViewFacultyScreenState extends State<ViewFacultyScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            width: 500,
+            height: 200,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Do you want to save changes?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        // Add logic to save faculty data here
+                      },
+                      child: Container(
+                        width: 120,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF010042),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "Submit",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        width: 120,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: Colors.grey.shade400,
+                            width: 1,
+                          ),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "No",
+                            style: TextStyle(
+                              color: Color(0xFF010042),
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildRadioGroup(double fontSize, double width) {
+    return SizedBox(
+      width: width,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Constraints",
+              style: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color:
+                    Colors
+                        .grey[600], // Changed to grey to indicate disabled state
+              ),
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: [
+                _buildRadioWithLabel("5PM Onwards Only", fontSize),
+                _buildRadioWithLabel("Saturday Only", fontSize),
+                _buildRadioWithLabel("8AM-5PM Only", fontSize),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRadioWithLabel(String label, double fontSize) {
+    return Row(
+      children: [
+        Radio<String>(
+          value: label,
+          groupValue: selectedConstraint,
+          onChanged: null, // Set to null to disable the radio button
+          activeColor:
+              Colors.grey[400], // Change color to indicate disabled state
+        ),
+        SizedBox(width: 8),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: fontSize * 0.8,
+            color: Colors.grey[400], // Change color to indicate disabled state
+          ),
+        ),
+      ],
     );
   }
 }

@@ -43,4 +43,29 @@ class RoomController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  Future<void> deleteRoom({required var id}) async {
+    isLoading.value = true;
+    errorMessage.value = '';
+    try {
+      final response = await GetConnect().post(
+        'http://localhost/autosched/backend_php/api/delete_row.php',
+        {'table': 'rooms', 'column_name': 'room_id', 'value': id},
+      );
+
+      if (response.status.hasError) {
+        throw Exception('Failed to delete room');
+      }
+
+      final body = response.body;
+      if (body['status'] == 'success') {
+      } else {
+        throw Exception(body['message'] ?? 'Unknown error occurred');
+      }
+    } catch (e) {
+      errorMessage.value = e.toString();
+    } finally {
+      isLoading.value = false;
+    }
+  }
 }

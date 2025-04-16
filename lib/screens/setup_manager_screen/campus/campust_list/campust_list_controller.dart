@@ -44,7 +44,7 @@ class CampustListController extends GetxController {
     try {
       final response = await GetConnect().post(
         'http://localhost/autosched/backend_php/api/delete_row.php',
-        {'table': 'campus_list', 'id': campusId},
+        {'table': 'campus_list', 'value': campusId},
       );
 
       if (response.status.hasError) {

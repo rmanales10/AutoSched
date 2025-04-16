@@ -1,5 +1,6 @@
 import 'package:autosched/screens/setup_manager_screen/faculty/edit_faculty/edit_faculty.dart';
 import 'package:autosched/screens/setup_manager_screen/faculty/faculty_screen/faculty_controller.dart';
+import 'package:autosched/screens/setup_manager_screen/faculty/viewfaculty.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -201,7 +202,13 @@ class _FacultyScreenState extends State<FacultyScreen> {
             color: Colors.green,
             size: 40,
           ),
-          onPressed: () => Navigator.pushNamed(context, '/view-faculty'),
+          onPressed:
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ViewfacultyScreen(id: int.parse(id)),
+                ),
+              ),
         ),
         IconButton(
           icon: const Icon(Icons.edit, color: Colors.green, size: 40),
@@ -213,7 +220,108 @@ class _FacultyScreenState extends State<FacultyScreen> {
                 ),
               ),
         ),
+        IconButton(
+          icon: const Icon(
+            Icons.delete,
+            color: Color.fromARGB(255, 243, 20, 4),
+            size: 50,
+          ),
+          onPressed: () => _showConfirmationDialog(context, id),
+        ),
       ],
+    );
+  }
+
+  void _showConfirmationDialog(BuildContext context, String id) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            width: 500,
+            height: 200,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Do you want to add changes ?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        await _controller.deleteFaculty(id: id);
+                        await _controller.fetchFacultyData();
+                        // ignore: use_build_context_synchronously
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        width: 120,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF010042),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "Submit",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        width: 120,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: Colors.grey.shade400,
+                            width: 1,
+                          ),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "No",
+                            style: TextStyle(
+                              color: Color(0xFF010042),
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

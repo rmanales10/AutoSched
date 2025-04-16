@@ -44,7 +44,7 @@ class DesignationListController extends GetxController {
     try {
       final response = await GetConnect().post(
         'http://localhost/autosched/backend_php/api/delete_row.php',
-        {'table': 'designation_list', 'id': id},
+        {'table': 'designation_list', 'value': id},
       );
 
       if (response.status.hasError) {

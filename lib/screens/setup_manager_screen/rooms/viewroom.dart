@@ -1,15 +1,41 @@
+import 'package:autosched/screens/setup_manager_screen/rooms/edit_room/edit_room.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 
 class ViewRoomScreen extends StatefulWidget {
-  const ViewRoomScreen({super.key});
+  final String roomId;
+  final String roomNumber;
+  final String roomName;
+  final String roomType;
+  final String descriptive;
+  const ViewRoomScreen({
+    super.key,
+    required this.roomId,
+    required this.roomNumber,
+    required this.roomName,
+    required this.roomType,
+    required this.descriptive,
+  });
 
   @override
-  _ViewRoomScreenSatate createState() => _ViewRoomScreenSatate();
+  _ViewRoomScreenState createState() => _ViewRoomScreenState();
 }
 
-class _ViewRoomScreenSatate extends State<ViewRoomScreen> {
+class _ViewRoomScreenState extends State<ViewRoomScreen> {
+  final _roomNumberController = TextEditingController();
+  final _roomNameController = TextEditingController();
+  final _descriptiveController = TextEditingController();
   String? selectedRoomType;
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      _roomNumberController.text = widget.roomNumber;
+      _roomNameController.text = widget.roomName;
+      _descriptiveController.text = widget.descriptive;
+      selectedRoomType = widget.roomType;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +74,7 @@ class _ViewRoomScreenSatate extends State<ViewRoomScreen> {
                       children: [
                         const SizedBox(height: 20),
                         const Text(
-                          "View Room",
+                          "Edit Room",
                           style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
@@ -65,8 +91,19 @@ class _ViewRoomScreenSatate extends State<ViewRoomScreen> {
                               const Color.fromARGB(255, 1, 0, 66),
                               Colors.white,
                               onTap:
-                                  () =>
-                                      Navigator.pushNamed(context, '/editroom'),
+                                  () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => EditRoomScreen(
+                                            roomId: widget.roomId,
+                                            roomNumber: widget.roomNumber,
+                                            roomName: widget.roomName,
+                                            roomType: widget.roomType,
+                                            descriptive: widget.descriptive,
+                                          ),
+                                    ),
+                                  ),
                             ),
                             const SizedBox(width: 20),
                             _buildButton(
@@ -98,10 +135,20 @@ class _ViewRoomScreenSatate extends State<ViewRoomScreen> {
           spacing: 50,
           runSpacing: 30,
           children: [
-            _buildTextField("Room Number", fontSize, width),
-            _buildTextField("Room Name", fontSize, width),
+            _buildTextField(
+              "Room Number",
+              fontSize,
+              width,
+              _roomNumberController,
+            ),
+            _buildTextField("Room Name", fontSize, width, _roomNameController),
             _buildDropdownField(fontSize, width),
-            _buildTextField("Add Description", fontSize, width),
+            _buildTextField(
+              "Add Description",
+              fontSize,
+              width,
+              _descriptiveController,
+            ),
           ],
         ),
       ],
@@ -158,7 +205,7 @@ class _ViewRoomScreenSatate extends State<ViewRoomScreen> {
             value: selectedRoomType,
             icon: Icon(
               Icons.arrow_drop_down_rounded,
-              color: Colors.grey.shade600,
+              color: Colors.grey.shade400, // Change to a lighter color
               size: 24,
             ),
             items:
@@ -176,18 +223,23 @@ class _ViewRoomScreenSatate extends State<ViewRoomScreen> {
                       ),
                     )
                     .toList(),
-            onChanged: (value) {
-              setState(() {
-                selectedRoomType = value;
-              });
-            },
+            onChanged: null, // Set to null to disable the dropdown
+            disabledHint: Text(
+              selectedRoomType ?? "Room Type",
+              style: TextStyle(fontSize: fontSize, color: Colors.black),
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildTextField(String hint, double fontSize, double width) {
+  Widget _buildTextField(
+    String hint,
+    double fontSize,
+    double width,
+    TextEditingController? controller,
+  ) {
     return SizedBox(
       width: width,
       child: Container(
@@ -198,6 +250,8 @@ class _ViewRoomScreenSatate extends State<ViewRoomScreen> {
           border: Border.all(width: 1, color: Colors.grey.shade300),
         ),
         child: TextField(
+          enabled: false,
+          controller: controller,
           style: TextStyle(fontSize: fontSize),
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(

@@ -4,6 +4,8 @@ import 'package:get_storage/get_storage.dart';
 class FacultyController extends GetxController {
   final GetConnect connect = GetConnect();
   final GetStorage storage = GetStorage();
+  RxBool isLoading = false.obs;
+  RxString error = ''.obs;
 
   // Reactive variable to store faculty data
   final RxList<Map<String, dynamic>> facultyData = <Map<String, dynamic>>[].obs;
@@ -42,6 +44,31 @@ class FacultyController extends GetxController {
       }
     } catch (e) {
       Get.snackbar('Error', 'An unexpected error occurred: $e');
+    }
+  }
+
+  Future<void> deleteFaculty({required var id}) async {
+    isLoading.value = true;
+    error.value = '';
+    try {
+      final response = await GetConnect().post(
+        'http://localhost/autosched/backend_php/api/delete_row.php',
+        {'table': 'faculty', 'column_name': 'faculty_id', 'value': id},
+      );
+
+      if (response.status.hasError) {
+        throw Exception('Failed to delete faculty');
+      }
+
+      final body = response.body;
+      if (body['status'] == 'success') {
+      } else {
+        throw Exception(body['message'] ?? 'Unknown error occurred');
+      }
+    } catch (e) {
+      error.value = e.toString();
+    } finally {
+      isLoading.value = false;
     }
   }
 }

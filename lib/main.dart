@@ -15,10 +15,8 @@ import 'package:autosched/screens/setup_manager_screen/designation/add_designati
 import 'package:autosched/screens/setup_manager_screen/designation/designation_list/designation_list.dart';
 import 'package:autosched/screens/setup_manager_screen/designation/viewdesignation.dart';
 import 'package:autosched/screens/setup_manager_screen/faculty/add_faculty/addfaculty.dart';
-import 'package:autosched/screens/setup_manager_screen/faculty/viewfaculty.dart';
 import 'package:autosched/screens/setup_manager_screen/rooms/add_rooms/addroom.dart';
 import 'package:autosched/screens/setup_manager_screen/faculty/faculty_screen/faculty.dart';
-import 'package:autosched/screens/setup_manager_screen/rooms/edit_room/edit_room.dart';
 import 'package:autosched/screens/setup_manager_screen/rooms/room/room_list.dart';
 import 'package:autosched/screens/setup_manager_screen/rooms/viewroom.dart';
 import 'package:autosched/screens/setup_manager_screen/subject/add_subject/add_subject.dart';
@@ -59,7 +57,7 @@ class MyApp extends StatelessWidget {
         '/teaching-load': (context) => const TeachingLoadScreen(),
         '/create_teaching-load': (context) => CreateTeachingLoadScreen(),
         '/assign-faculty-load': (context) => AssignFacultyLoadScreen(),
-        '/view-faculty': (context) => ViewFacultyScreen(),
+        // '/view-faculty': (context) => ViewFacultyScreen(),
         '/setup-manager/faculty':
             (context) => FacultyScreen(
               selectedItem: 'Faculty',
@@ -109,7 +107,7 @@ class MyApp extends StatelessWidget {
         '/adddesignation': (context) => const AddDesignationScreen(),
         '/viewdesignation': (context) => const ViewDesignationScreen(),
         // '/editdesignation': (context) => const EditDesignationScreen(),
-        '/viewroom': (context) => const ViewRoomScreen(),
+        // '/viewroom': (context) => const ViewRoomScreen(),
         // '/editroom': (context) => const EditRoomScreen(),
         '/addsubject': (context) => const AddSubjectScreen(),
         '/viewsubject': (context) => const ViewSubjectScreen(),
