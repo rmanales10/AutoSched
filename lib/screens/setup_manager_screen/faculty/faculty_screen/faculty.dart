@@ -100,9 +100,6 @@ class _FacultyScreenState extends State<FacultyScreen> {
 
                   Expanded(
                     child: Obx(() {
-                      if (_controller.facultyData.isEmpty) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
                       return SingleChildScrollView(
                         child: Column(
                           children: [

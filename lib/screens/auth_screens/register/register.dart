@@ -242,7 +242,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 size: 24,
               ),
               items:
-                  ['SCHEDULER', 'ACAD', 'TEACHER'].map((role) {
+                  ['SCHEDULER', 'ACAD', 'CHAIRMAN', 'ADMIN'].map((role) {
                     return DropdownMenuItem(
                       value: role,
                       child: Text(role, style: TextStyle(color: Colors.black)),

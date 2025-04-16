@@ -1,4 +1,8 @@
+import 'package:autosched/screens/auth_screens/login/login_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_rx/get_rx.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:get_storage/get_storage.dart';
 
 class Sidebar extends StatefulWidget {
   final String selectedItem;
@@ -15,8 +19,11 @@ class Sidebar extends StatefulWidget {
 }
 
 class _SidebarState extends State<Sidebar> {
+  final _loginController = LoginController();
   bool isSetupManagerExpanded = false;
   bool isSchedulerExpanded = false;
+  RxString accessRole = ''.obs;
+  final _storage = GetStorage();
 
   @override
   Widget build(BuildContext context) {
@@ -43,178 +50,447 @@ class _SidebarState extends State<Sidebar> {
             // Scrollable section from Home to Reports
             Expanded(
               child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SidebarItem(
-                      title: 'Home',
-                      isSelected: widget.selectedItem == 'Home',
-                      onTap: () => widget.onItemSelected('Home', '/home'),
-                      fontSize: fontSize,
-                    ),
-                    SidebarItem(
-                      title: 'My Profile',
-                      isSelected: widget.selectedItem == 'My Profile',
-                      onTap:
-                          () => widget.onItemSelected('My Profile', '/profile'),
-                      fontSize: fontSize,
-                    ),
-                    SidebarItem(
-                      title: 'Curriculum',
-                      isSelected: widget.selectedItem == 'Curriculum',
-                      onTap:
-                          () => widget.onItemSelected(
-                            'Curriculum',
-                            '/curriculum',
-                          ),
-                      fontSize: fontSize,
-                    ),
-                    SidebarItem(
-                      title: 'Teaching Load',
-                      isSelected: widget.selectedItem == 'Teaching Load',
-                      onTap:
-                          () => widget.onItemSelected(
-                            'Teaching Load',
-                            '/teaching-load',
-                          ),
-                      fontSize: fontSize,
-                    ),
+                child: Obx(() {
+                  accessRole.value = _storage.read('access_role') ?? 'ADMIN';
 
-                    _buildExpandableSection(
-                      title: 'Setup Manager',
-                      isExpanded: isSetupManagerExpanded,
-                      onExpandToggle:
-                          () => setState(
-                            () =>
-                                isSetupManagerExpanded =
-                                    !isSetupManagerExpanded,
-                          ),
-                      items: [
-                        SidebarItem(
-                          title: 'Campus',
-                          isSelected: widget.selectedItem == 'Campus',
-                          onTap: () {
-                            setState(() {});
-                            widget.onItemSelected(
-                              'Campus',
-                              '/setup-manager/campus',
-                            );
-                          },
-                          fontSize: 14,
-                        ),
-                        SidebarItem(
-                          title: 'Faculty',
-                          isSelected: widget.selectedItem == 'Faculty',
-                          onTap: () {
-                            setState(() {});
-                            widget.onItemSelected(
-                              'Faculty',
-                              '/setup-manager/faculty',
-                            );
-                          },
-                          fontSize: 14,
-                        ),
-                        SidebarItem(
-                          title: 'Designation',
-                          isSelected: widget.selectedItem == 'Designation',
-                          onTap: () {
-                            setState(() {});
-                            widget.onItemSelected(
-                              'Designation',
-                              '/setup-manager/designation',
-                            );
-                          },
-                          fontSize: 14,
-                        ),
-                        SidebarItem(
-                          title: 'Rooms',
-                          isSelected: widget.selectedItem == 'Rooms',
-                          onTap: () {
-                            setState(() {});
-                            widget.onItemSelected(
-                              'Rooms',
-                              '/setup-manager/rooms',
-                            );
-                          },
-                          fontSize: 14,
-                        ),
-                        SidebarItem(
-                          title: 'Subjects',
-                          isSelected: widget.selectedItem == 'Subjects',
-                          onTap: () {
-                            setState(() {});
-                            widget.onItemSelected(
-                              'Subjects',
-                              '/setup-manager/subjects',
-                            );
-                          },
-                          fontSize: 14,
-                        ),
-                      ],
-                    ),
-
-                    _buildExpandableSection(
-                      title: 'Scheduler',
-                      isExpanded: isSchedulerExpanded,
-                      onExpandToggle:
-                          () => setState(
-                            () => isSchedulerExpanded = !isSchedulerExpanded,
-                          ),
-                      items: [
-                        SidebarItem(
-                          title: 'Generate Schedule',
-                          isSelected:
-                              widget.selectedItem == 'Generate Schedule',
-                          onTap: () {
-                            setState(() {});
-                            widget.onItemSelected(
-                              'Generate Schedule',
-                              '/generate-load',
-                            );
-                          },
-                          fontSize: 14,
-                        ),
-                        SidebarItem(
-                          title: 'Generated Schedules',
-                          isSelected:
-                              widget.selectedItem == 'Generated Schedules',
-                          onTap: () {
-                            setState(() {});
-                            widget.onItemSelected(
-                              'Generated Schedules',
-                              '/generated_schedules',
-                            );
-                          },
-                          fontSize: 14,
-                        ),
-                      ],
-                    ),
-
-                    SidebarItem(
-                      title: 'Reports',
-                      isSelected: widget.selectedItem == 'Reports',
-                      onTap: () => widget.onItemSelected('Reports', '/reports'),
-                      fontSize: fontSize,
-                    ),
-                  ],
-                ),
+                  if (accessRole.value == 'ADMIN') {
+                    return adminRoles(fontSize);
+                  }
+                  if (accessRole.value == 'ACAD') {
+                    return acadRoles(fontSize);
+                  }
+                  if (accessRole.value == 'SCHEDULER') {
+                    return schedulerRoles(fontSize);
+                  }
+                  if (accessRole.value == 'CHAIRMAN') {
+                    return chairmanRoles(fontSize);
+                  }
+                  return SizedBox.shrink();
+                }),
               ),
             ),
 
-            // Fixed position logout button
-            Padding(
-              padding: const EdgeInsets.only(left: 20),
-              child: Text(
-                'Logout',
-                style: TextStyle(
-                  fontSize: fontSize + 5,
-                  fontWeight: FontWeight.bold,
+            GestureDetector(
+              onTap: () => _loginController.logout(context),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20),
+                child: Text(
+                  'Logout',
+                  style: TextStyle(
+                    fontSize: fontSize + 5,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Column adminRoles(double fontSize) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SidebarItem(
+          title: 'Home',
+          isSelected: widget.selectedItem == 'Home',
+          onTap: () => widget.onItemSelected('Home', '/home'),
+          fontSize: fontSize,
+        ),
+        SidebarItem(
+          title: 'My Profile',
+          isSelected: widget.selectedItem == 'My Profile',
+          onTap: () => widget.onItemSelected('My Profile', '/profile'),
+          fontSize: fontSize,
+        ),
+        SidebarItem(
+          title: 'Curriculum',
+          isSelected: widget.selectedItem == 'Curriculum',
+          onTap: () => widget.onItemSelected('Curriculum', '/curriculum'),
+          fontSize: fontSize,
+        ),
+        SidebarItem(
+          title: 'Teaching Load',
+          isSelected: widget.selectedItem == 'Teaching Load',
+          onTap: () => widget.onItemSelected('Teaching Load', '/teaching-load'),
+          fontSize: fontSize,
+        ),
+
+        _buildExpandableSection(
+          title: 'Setup Manager',
+          isExpanded: isSetupManagerExpanded,
+          onExpandToggle:
+              () => setState(
+                () => isSetupManagerExpanded = !isSetupManagerExpanded,
+              ),
+          items: [
+            SidebarItem(
+              title: 'Campus',
+              isSelected: widget.selectedItem == 'Campus',
+              onTap: () {
+                setState(() {});
+                widget.onItemSelected('Campus', '/setup-manager/campus');
+              },
+              fontSize: 14,
+            ),
+            SidebarItem(
+              title: 'Faculty',
+              isSelected: widget.selectedItem == 'Faculty',
+              onTap: () {
+                setState(() {});
+                widget.onItemSelected('Faculty', '/setup-manager/faculty');
+              },
+              fontSize: 14,
+            ),
+            SidebarItem(
+              title: 'Designation',
+              isSelected: widget.selectedItem == 'Designation',
+              onTap: () {
+                setState(() {});
+                widget.onItemSelected(
+                  'Designation',
+                  '/setup-manager/designation',
+                );
+              },
+              fontSize: 14,
+            ),
+            SidebarItem(
+              title: 'Rooms',
+              isSelected: widget.selectedItem == 'Rooms',
+              onTap: () {
+                setState(() {});
+                widget.onItemSelected('Rooms', '/setup-manager/rooms');
+              },
+              fontSize: 14,
+            ),
+            SidebarItem(
+              title: 'Subjects',
+              isSelected: widget.selectedItem == 'Subjects',
+              onTap: () {
+                setState(() {});
+                widget.onItemSelected('Subjects', '/setup-manager/subjects');
+              },
+              fontSize: 14,
+            ),
+          ],
+        ),
+
+        _buildExpandableSection(
+          title: 'Scheduler',
+          isExpanded: isSchedulerExpanded,
+          onExpandToggle:
+              () => setState(() => isSchedulerExpanded = !isSchedulerExpanded),
+          items: [
+            SidebarItem(
+              title: 'Generate Schedule',
+              isSelected: widget.selectedItem == 'Generate Schedule',
+              onTap: () {
+                setState(() {});
+                widget.onItemSelected('Generate Schedule', '/generate-load');
+              },
+              fontSize: 14,
+            ),
+            SidebarItem(
+              title: 'Generated Schedules',
+              isSelected: widget.selectedItem == 'Generated Schedules',
+              onTap: () {
+                setState(() {});
+                widget.onItemSelected(
+                  'Generated Schedules',
+                  '/generated_schedules',
+                );
+              },
+              fontSize: 14,
+            ),
+          ],
+        ),
+
+        SidebarItem(
+          title: 'Reports',
+          isSelected: widget.selectedItem == 'Reports',
+          onTap: () => widget.onItemSelected('Reports', '/reports'),
+          fontSize: fontSize,
+        ),
+      ],
+    );
+  }
+
+  Column acadRoles(double fontSize) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SidebarItem(
+          title: 'Home',
+          isSelected: widget.selectedItem == 'Home',
+          onTap: () => widget.onItemSelected('Home', '/home'),
+          fontSize: fontSize,
+        ),
+        SidebarItem(
+          title: 'My Profile',
+          isSelected: widget.selectedItem == 'My Profile',
+          onTap: () => widget.onItemSelected('My Profile', '/profile'),
+          fontSize: fontSize,
+        ),
+        SidebarItem(
+          title: 'Curriculum',
+          isSelected: widget.selectedItem == 'Curriculum',
+          onTap: () => widget.onItemSelected('Curriculum', '/curriculum'),
+          fontSize: fontSize,
+        ),
+        SidebarItem(
+          title: 'Teaching Load',
+          isSelected: widget.selectedItem == 'Teaching Load',
+          onTap: () => widget.onItemSelected('Teaching Load', '/teaching-load'),
+          fontSize: fontSize,
+        ),
+
+        _buildExpandableSection(
+          title: 'Setup Manager',
+          isExpanded: isSetupManagerExpanded,
+          onExpandToggle:
+              () => setState(
+                () => isSetupManagerExpanded = !isSetupManagerExpanded,
+              ),
+          items: [
+            SidebarItem(
+              title: 'Faculty',
+              isSelected: widget.selectedItem == 'Faculty',
+              onTap: () {
+                setState(() {});
+                widget.onItemSelected('Faculty', '/setup-manager/faculty');
+              },
+              fontSize: 14,
+            ),
+          ],
+        ),
+
+        _buildExpandableSection(
+          title: 'Scheduler',
+          isExpanded: isSchedulerExpanded,
+          onExpandToggle:
+              () => setState(() => isSchedulerExpanded = !isSchedulerExpanded),
+          items: [
+            SidebarItem(
+              title: 'Generate Schedule',
+              isSelected: widget.selectedItem == 'Generate Schedule',
+              onTap: () {
+                setState(() {});
+                widget.onItemSelected('Generate Schedule', '/generate-load');
+              },
+              fontSize: 14,
+            ),
+            SidebarItem(
+              title: 'Generated Schedules',
+              isSelected: widget.selectedItem == 'Generated Schedules',
+              onTap: () {
+                setState(() {});
+                widget.onItemSelected(
+                  'Generated Schedules',
+                  '/generated_schedules',
+                );
+              },
+              fontSize: 14,
+            ),
+          ],
+        ),
+
+        SidebarItem(
+          title: 'Reports',
+          isSelected: widget.selectedItem == 'Reports',
+          onTap: () => widget.onItemSelected('Reports', '/reports'),
+          fontSize: fontSize,
+        ),
+      ],
+    );
+  }
+
+  Column chairmanRoles(double fontSize) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SidebarItem(
+          title: 'Home',
+          isSelected: widget.selectedItem == 'Home',
+          onTap: () => widget.onItemSelected('Home', '/home'),
+          fontSize: fontSize,
+        ),
+        SidebarItem(
+          title: 'My Profile',
+          isSelected: widget.selectedItem == 'My Profile',
+          onTap: () => widget.onItemSelected('My Profile', '/profile'),
+          fontSize: fontSize,
+        ),
+        SidebarItem(
+          title: 'Curriculum',
+          isSelected: widget.selectedItem == 'Curriculum',
+          onTap: () => widget.onItemSelected('Curriculum', '/curriculum'),
+          fontSize: fontSize,
+        ),
+        SidebarItem(
+          title: 'Teaching Load',
+          isSelected: widget.selectedItem == 'Teaching Load',
+          onTap: () => widget.onItemSelected('Teaching Load', '/teaching-load'),
+          fontSize: fontSize,
+        ),
+
+        _buildExpandableSection(
+          title: 'Setup Manager',
+          isExpanded: isSetupManagerExpanded,
+          onExpandToggle:
+              () => setState(
+                () => isSetupManagerExpanded = !isSetupManagerExpanded,
+              ),
+          items: [
+            SidebarItem(
+              title: 'Faculty',
+              isSelected: widget.selectedItem == 'Faculty',
+              onTap: () {
+                setState(() {});
+                widget.onItemSelected('Faculty', '/setup-manager/faculty');
+              },
+              fontSize: 14,
+            ),
+          ],
+        ),
+
+        _buildExpandableSection(
+          title: 'Scheduler',
+          isExpanded: isSchedulerExpanded,
+          onExpandToggle:
+              () => setState(() => isSchedulerExpanded = !isSchedulerExpanded),
+          items: [
+            SidebarItem(
+              title: 'Generate Schedule',
+              isSelected: widget.selectedItem == 'Generate Schedule',
+              onTap: () {
+                setState(() {});
+                widget.onItemSelected('Generate Schedule', '/generate-load');
+              },
+              fontSize: 14,
+            ),
+            SidebarItem(
+              title: 'Generated Schedules',
+              isSelected: widget.selectedItem == 'Generated Schedules',
+              onTap: () {
+                setState(() {});
+                widget.onItemSelected(
+                  'Generated Schedules',
+                  '/generated_schedules',
+                );
+              },
+              fontSize: 14,
+            ),
+          ],
+        ),
+
+        SidebarItem(
+          title: 'Reports',
+          isSelected: widget.selectedItem == 'Reports',
+          onTap: () => widget.onItemSelected('Reports', '/reports'),
+          fontSize: fontSize,
+        ),
+      ],
+    );
+  }
+
+  Column schedulerRoles(double fontSize) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SidebarItem(
+          title: 'Home',
+          isSelected: widget.selectedItem == 'Home',
+          onTap: () => widget.onItemSelected('Home', '/home'),
+          fontSize: fontSize,
+        ),
+        SidebarItem(
+          title: 'My Profile',
+          isSelected: widget.selectedItem == 'My Profile',
+          onTap: () => widget.onItemSelected('My Profile', '/profile'),
+          fontSize: fontSize,
+        ),
+        SidebarItem(
+          title: 'Curriculum',
+          isSelected: widget.selectedItem == 'Curriculum',
+          onTap: () => widget.onItemSelected('Curriculum', '/curriculum'),
+          fontSize: fontSize,
+        ),
+        SidebarItem(
+          title: 'Teaching Load',
+          isSelected: widget.selectedItem == 'Teaching Load',
+          onTap: () => widget.onItemSelected('Teaching Load', '/teaching-load'),
+          fontSize: fontSize,
+        ),
+
+        _buildExpandableSection(
+          title: 'Setup Manager',
+          isExpanded: isSetupManagerExpanded,
+          onExpandToggle:
+              () => setState(
+                () => isSetupManagerExpanded = !isSetupManagerExpanded,
+              ),
+          items: [
+            SidebarItem(
+              title: 'Faculty',
+              isSelected: widget.selectedItem == 'Faculty',
+              onTap: () {
+                setState(() {});
+                widget.onItemSelected('Faculty', '/setup-manager/faculty');
+              },
+              fontSize: 14,
+            ),
+
+            SidebarItem(
+              title: 'Rooms',
+              isSelected: widget.selectedItem == 'Rooms',
+              onTap: () {
+                setState(() {});
+                widget.onItemSelected('Rooms', '/setup-manager/rooms');
+              },
+              fontSize: 14,
+            ),
+          ],
+        ),
+
+        _buildExpandableSection(
+          title: 'Scheduler',
+          isExpanded: isSchedulerExpanded,
+          onExpandToggle:
+              () => setState(() => isSchedulerExpanded = !isSchedulerExpanded),
+          items: [
+            SidebarItem(
+              title: 'Generate Schedule',
+              isSelected: widget.selectedItem == 'Generate Schedule',
+              onTap: () {
+                setState(() {});
+                widget.onItemSelected('Generate Schedule', '/generate-load');
+              },
+              fontSize: 14,
+            ),
+            SidebarItem(
+              title: 'Generated Schedules',
+              isSelected: widget.selectedItem == 'Generated Schedules',
+              onTap: () {
+                setState(() {});
+                widget.onItemSelected(
+                  'Generated Schedules',
+                  '/generated_schedules',
+                );
+              },
+              fontSize: 14,
+            ),
+          ],
+        ),
+
+        SidebarItem(
+          title: 'Reports',
+          isSelected: widget.selectedItem == 'Reports',
+          onTap: () => widget.onItemSelected('Reports', '/reports'),
+          fontSize: fontSize,
+        ),
+      ],
     );
   }
 

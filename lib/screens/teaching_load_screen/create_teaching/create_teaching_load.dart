@@ -325,10 +325,7 @@ class _CreateTeachingLoadScreenState extends State<CreateTeachingLoadScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        _submitTeachingLoad();
-                        Navigator.of(context).pop();
-                      },
+                      onTap: () => _submitTeachingLoad(),
                       child: Container(
                         width: 120,
                         height: 30,
@@ -402,9 +399,8 @@ class _CreateTeachingLoadScreenState extends State<CreateTeachingLoadScreen> {
       year3: sections['3rd Year']!,
       year4: sections['4th Year']!,
     );
-    if (_controller.isSuccess) {
-      Navigator.pushReplacementNamed(context, '/teaching-load');
-      await _teachingLoadController.fetchTeachingLoads();
-    }
+
+    Navigator.pushReplacementNamed(context, '/teaching-load');
+    await _teachingLoadController.fetchTeachingLoads();
   }
 }

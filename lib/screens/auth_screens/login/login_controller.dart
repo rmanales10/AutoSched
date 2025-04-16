@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -36,6 +37,7 @@ class LoginController extends GetxController {
         _isSuccess.value = true;
         _errorMessage.value = data['message'] ?? 'Login Successfully!';
         _currentUser.value = data['user'];
+        _storage.write('access_role', data['user']['access_role']);
 
         // Save the user ID to storage
         if (data['user'] != null && data['user']['id'] != null) {
@@ -61,9 +63,9 @@ class LoginController extends GetxController {
         return;
       }
 
-      final response = await _connect.get(
-        'http://localhost/autosched/backend_php/api/get_current_user.php',
-        query: {'user_id': userId},
+      final response = await _connect.post(
+        'http://localhost/autosched/backend_php/api/get_row.php?table_name=users',
+        {'user_id': userId},
       );
 
       if (response.status.hasError) {
@@ -73,7 +75,7 @@ class LoginController extends GetxController {
 
       final data = response.body;
       if (data['status'] == 'success') {
-        _currentUser.value = data['user'];
+        _currentUser.value = data['data'][0];
       } else {
         _errorMessage.value = data['message'] ?? 'Failed to get current user';
       }
@@ -82,9 +84,11 @@ class LoginController extends GetxController {
     }
   }
 
-  void logout() {
+  void logout(BuildContext context) {
     _currentUser.value = {};
     _isSuccess.value = false;
     _storage.remove('user_id');
+    _storage.remove('access_role');
+    Navigator.pushReplacementNamed(context, '/');
   }
 }
