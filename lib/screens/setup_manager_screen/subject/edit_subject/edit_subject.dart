@@ -26,7 +26,7 @@ class _EditSubjectScreenState extends State<EditSubjectScreen> {
   final _lecUnitController = TextEditingController();
   final _creditController = TextEditingController();
   final subjectArea = ['IT', 'CS', 'Engineering'];
-  final yearLevel = ['1st Year', '2nd Year'];
+  final yearLevel = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
   final program = ['Full-Time', 'Part-Time'];
   final major = ['Computer Science', 'Information Technology', 'Engineering'];
   final mode = ['Online', 'On-site'];

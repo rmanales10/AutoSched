@@ -1,4 +1,5 @@
 import 'package:autosched/screens/curriculum_screen/create_curriculum/create_curriculum_controller.dart';
+import 'package:autosched/screens/curriculum_screen/curriculum_list/curriculum_list_controller.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,6 +13,7 @@ class CreateCurriculumScreen extends StatefulWidget {
 
 class _CreateCurriculumScreenState extends State<CreateCurriculumScreen> {
   final _controller = Get.put(CreateCurriculumController());
+  final _curriculumListController = Get.put(CurriculumListController());
   String? selectedProgram;
   String? selectedMajor;
   String? selectedCampus;
@@ -358,6 +360,7 @@ class _CreateCurriculumScreenState extends State<CreateCurriculumScreen> {
       Get.snackbar('Success', "Curriculum saved successfully!");
       // ignore: use_build_context_synchronously
       Navigator.pushNamed(context, '/curriculum');
+      await _curriculumListController.fetchCurriculums();
     } else {
       Get.snackbar('Error', _controller.errorMessage.value);
     }

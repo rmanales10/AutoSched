@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class CampustListController extends GetxController {
   final RxList<dynamic> campuses = <dynamic>[].obs;
@@ -16,9 +17,10 @@ class CampustListController extends GetxController {
     error.value = '';
 
     try {
-      final response = await GetConnect().get(
+      final userId = await GetStorage().read('user_id');
+      final response = await GetConnect().post(
         'http://localhost/autosched/backend_php/api/get_row.php?table_name=campus_list',
-        headers: {'Content-Type': 'application/json'},
+        {'user_id': userId},
       );
 
       if (response.status.hasError) {

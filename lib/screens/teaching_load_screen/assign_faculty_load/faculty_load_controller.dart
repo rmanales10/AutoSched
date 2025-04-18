@@ -12,8 +12,10 @@ class FacultyLoadController extends GetxController {
 
   Future<void> fetchLoad() async {
     try {
-      final response = await _connect.get(
-        'http://localhost/autosched/backend_php/api/get_row.php?table_name=faculty_load',
+      final userId = await GetStorage().read('user_id');
+      final response = await _connect.post(
+        'http://localhost/autosched/backend_php/api/get_row.php?table_name=subjects',
+        {'user_id': userId},
       );
 
       if (response.status.hasError) {

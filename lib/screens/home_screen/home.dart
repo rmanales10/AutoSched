@@ -1,7 +1,5 @@
-import 'package:autosched/screens/profile_screen/profile/profile_controller.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,8 +17,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     Navigator.pushNamed(context, route);
   }
-
-  final _controller = Get.put(ProfileController());
 
   @override
   Widget build(BuildContext context) {
@@ -42,42 +38,40 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Obx(() {
-                      final user = _controller.currentUser;
-                      return RichText(
-                        text: TextSpan(
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                          children: [
-                            TextSpan(
-                              text: 'Auto',
-                              style: TextStyle(
-                                fontSize: logoSize,
-                                color: const Color(0xFFFA9702),
-                              ),
+                    RichText(
+                      text: TextSpan(
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        children: [
+                          TextSpan(
+                            text: 'Auto',
+                            style: TextStyle(
+                              fontSize: logoSize,
+                              color: const Color(0xFFFA9702),
                             ),
-                            TextSpan(
-                              text: user['access_role'] ?? 'N/A',
-                              style: TextStyle(
-                                fontSize: logoSize,
-                                color: const Color(0xFF010042),
-                              ),
+                          ),
+                          TextSpan(
+                            text: 'Sched',
+                            style: TextStyle(
+                              fontSize: logoSize,
+                              color: const Color(0xFF010042),
                             ),
-                            WidgetSpan(
-                              child: Transform.translate(
-                                offset: const Offset(0, -10),
-                                child: Text(
-                                  '®',
-                                  style: TextStyle(
-                                    fontSize: logoSize / 2,
-                                    color: const Color(0xFFEB8D01),
-                                  ),
+                          ),
+                          WidgetSpan(
+                            child: Transform.translate(
+                              offset: const Offset(0, -10),
+                              child: Text(
+                                '®',
+                                style: TextStyle(
+                                  fontSize: logoSize / 2,
+                                  color: const Color(0xFFEB8D01),
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                      );
-                    }),
+                          ),
+                        ],
+                      ),
+                    ),
+
                     const SizedBox(height: 10),
                     Text(
                       'Wave goodbye to scheduling headaches and hello to effortless planning.',

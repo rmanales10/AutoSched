@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class CurriculumListController extends GetxController {
   final _connect = GetConnect();
@@ -18,8 +19,10 @@ class CurriculumListController extends GetxController {
     errorMessage('');
 
     try {
-      final response = await _connect.get(
+      final userId = await GetStorage().read('user_id');
+      final response = await _connect.post(
         'http://localhost/autosched/backend_php/api/get_row.php?table_name=curriculum',
+        {'user_id': userId},
       );
 
       if (response.status.hasError) {

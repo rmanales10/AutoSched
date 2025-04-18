@@ -1,7 +1,9 @@
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class SubjectListController extends GetxController {
   final _connect = GetConnect();
+  final _storage = GetStorage();
 
   final RxList<Map<String, dynamic>> subjects = <Map<String, dynamic>>[].obs;
   final RxBool isLoading = false.obs;
@@ -18,8 +20,10 @@ class SubjectListController extends GetxController {
     errorMessage('');
 
     try {
-      final response = await _connect.get(
+      final userId = await _storage.read('user_id');
+      final response = await _connect.post(
         'http://localhost/autosched/backend_php/api/get_row.php?table_name=subjects',
+        {'user_id': userId},
       );
 
       if (response.status.hasError) {

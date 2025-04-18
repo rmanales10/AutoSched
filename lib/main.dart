@@ -18,7 +18,6 @@ import 'package:autosched/screens/setup_manager_screen/faculty/add_faculty/addfa
 import 'package:autosched/screens/setup_manager_screen/rooms/add_rooms/addroom.dart';
 import 'package:autosched/screens/setup_manager_screen/faculty/faculty_screen/faculty.dart';
 import 'package:autosched/screens/setup_manager_screen/rooms/room/room_list.dart';
-import 'package:autosched/screens/setup_manager_screen/rooms/viewroom.dart';
 import 'package:autosched/screens/setup_manager_screen/subject/add_subject/add_subject.dart';
 import 'package:autosched/screens/setup_manager_screen/subject/subject_list/subjects_list.dart';
 import 'package:autosched/screens/setup_manager_screen/subject/viewsubject.dart';
