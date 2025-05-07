@@ -1,3 +1,4 @@
+import 'package:autosched/screens/teaching_load_screen/assign_faculty_load/assign_faculty_load.dart';
 import 'package:autosched/screens/teaching_load_screen/teaching_load_list/view_load_controller.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
@@ -12,11 +13,17 @@ class TeachingLoadScreen extends StatefulWidget {
 
 class _TeachingLoadScreenState extends State<TeachingLoadScreen> {
   final _controller = Get.put(ViewLoadController());
+  final Set<String> _selectedItems = {};
   String selectedItem = "Teaching Load";
+  bool _deleteMode = false;
 
   @override
   void initState() {
     super.initState();
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
     _controller.fetchTeachingLoads();
   }
 
@@ -63,12 +70,12 @@ class _TeachingLoadScreenState extends State<TeachingLoadScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             'TEACHING LOAD LIST',
             style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
           ),
+          Spacer(),
           IconButton(
             icon: const Icon(
               Icons.note_add_rounded,
@@ -79,6 +86,29 @@ class _TeachingLoadScreenState extends State<TeachingLoadScreen> {
               Navigator.pushNamed(context, '/create_teaching-load');
             },
           ),
+          IconButton(
+            icon: Icon(
+              _deleteMode ? Icons.close : Icons.delete,
+              color: Color.fromARGB(255, 243, 20, 4),
+              size: 50,
+            ),
+            onPressed: () {
+              setState(() {
+                _deleteMode = !_deleteMode;
+                if (!_deleteMode) {
+                  _selectedItems.clear();
+                }
+              });
+            },
+          ),
+          if (_deleteMode)
+            IconButton(
+              onPressed: () async {
+                _showConfirmationDialog(context);
+              },
+              icon: Icon(Icons.check, color: Colors.white),
+              style: IconButton.styleFrom(backgroundColor: Colors.green),
+            ),
         ],
       ),
     );
@@ -90,10 +120,13 @@ class _TeachingLoadScreenState extends State<TeachingLoadScreen> {
       ..._controller.teachingLoads.map(
         (load) => [
           load['teaching_load_id'].toString(),
-          "FINAL-LOAD-2024", // You might want to replace this with actual data
+          "FINAL-LOAD-2024",
           load['program'],
           load['semester'],
-          "",
+          load['1st_year'].toString(),
+          load['2nd_year'].toString(),
+          load['3rd_year'].toString(),
+          load['4th_year'].toString(),
         ],
       ),
     ];
@@ -102,14 +135,22 @@ class _TeachingLoadScreenState extends State<TeachingLoadScreen> {
       child: SingleChildScrollView(
         child: Column(
           children: List.generate(teachingLoadData.length, (index) {
-            return _buildRow(teachingLoadData[index], index);
+            return _buildRow(
+              teachingLoadData[index],
+              index,
+              showCheckbox: _deleteMode,
+            );
           }),
         ),
       ),
     );
   }
 
-  Widget _buildRow(List<String> values, int index) {
+  Widget _buildRow(
+    List<String> values,
+    int index, {
+    bool showCheckbox = false,
+  }) {
     bool isHeader = index == 0;
     bool isEvenRow = index % 2 == 0;
 
@@ -121,6 +162,19 @@ class _TeachingLoadScreenState extends State<TeachingLoadScreen> {
       ),
       child: Row(
         children: [
+          if (showCheckbox && !isHeader)
+            Checkbox(
+              value: _selectedItems.contains(values[0]),
+              onChanged: (bool? value) {
+                setState(() {
+                  if (value == true) {
+                    _selectedItems.add(values[0]);
+                  } else {
+                    _selectedItems.remove(values[0]);
+                  }
+                });
+              },
+            ),
           Expanded(flex: 1, child: _rowText(values[0], isHeader)), // ID
           Expanded(
             flex: 3,
@@ -130,7 +184,10 @@ class _TeachingLoadScreenState extends State<TeachingLoadScreen> {
           Expanded(flex: 2, child: _rowText(values[3], isHeader)), // Status
           Expanded(
             flex: 2,
-            child: isHeader ? _rowText(values[4], isHeader) : _actionIcons(),
+            child:
+                isHeader
+                    ? _rowText(values[4], isHeader)
+                    : _actionIcons(values[0]),
           ), // Actions
         ],
       ),
@@ -148,13 +205,17 @@ class _TeachingLoadScreenState extends State<TeachingLoadScreen> {
     );
   }
 
-  Widget _actionIcons() {
+  Widget _actionIcons(String id) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         GestureDetector(
           onTap: () {
-            Navigator.pushNamed(context, '/assign-faculty-load');
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => AssignFacultyLoadScreen(id: id),
+              ),
+            );
           },
           child: Stack(
             children: [
@@ -187,6 +248,107 @@ class _TeachingLoadScreenState extends State<TeachingLoadScreen> {
           onPressed: () {},
         ),
       ],
+    );
+  }
+
+  void _showConfirmationDialog(BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            width: 500,
+            height: 200,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Do you want to add changes ?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        if (_selectedItems.isNotEmpty) {
+                          await _controller.deleteMultipleTeachingLoads(
+                            _selectedItems.toList(),
+                          );
+                          setState(() {
+                            _selectedItems.clear();
+                            _deleteMode = false;
+                          });
+                          _controller.refreshTeachingLoads();
+                        }
+                        // ignore: use_build_context_synchronously
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        width: 120,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF010042),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "Submit",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        width: 120,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: Colors.grey.shade400,
+                            width: 1,
+                          ),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "No",
+                            style: TextStyle(
+                              color: Color(0xFF010042),
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

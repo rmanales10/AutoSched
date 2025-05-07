@@ -139,8 +139,9 @@ class _SidebarState extends State<Sidebar> {
               title: 'Faculty',
               isSelected: widget.selectedItem == 'Faculty',
               onTap: () {
-                setState(() {});
-                widget.onItemSelected('Faculty', '/setup-manager/faculty');
+                setState(() {
+                  widget.onItemSelected('Faculty', '/setup-manager/faculty');
+                });
               },
               fontSize: 14,
             ),

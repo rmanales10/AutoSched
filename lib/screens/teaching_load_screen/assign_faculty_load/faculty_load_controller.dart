@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -9,6 +11,8 @@ class FacultyLoadController extends GetxController {
   final RxList<List<String>> loadId = <List<String>>[].obs;
   final RxList<String> facultyList = <String>[].obs;
   final RxList<String> sectionList = <String>[].obs;
+  final RxList<Map<String, dynamic>> facultyLoadData =
+      <Map<String, dynamic>>[].obs;
 
   Future<void> fetchLoad() async {
     try {
@@ -48,7 +52,7 @@ class FacultyLoadController extends GetxController {
           entry['faculty']?.toString() ?? '',
           entry['section']?.toString() ?? '',
         ]);
-        loadId.add([entry['load_id']?.toString() ?? '']);
+        loadId.add([entry['id']?.toString() ?? '']);
       }
     } catch (e) {
       Get.snackbar('Error', 'Failed to fetch load data: $e');
@@ -110,14 +114,19 @@ class FacultyLoadController extends GetxController {
     String section,
   ) async {
     try {
-      final response = await _connect
-          .post('http://localhost/autosched/backend_php/api/update_row.php', {
-            'table_name': 'faculty_load',
-            'id_column': 'load_id',
-            'id_value': loadId,
+      final userId = await _storage.read('user_id');
+      final response = await _connect.post(
+        'http://localhost/autosched/backend_php/api/add_row.php',
+        {
+          'table_name': 'faculty_load',
+          'columns': {
+            'user_id': userId,
+            'subject_id': loadId,
             'faculty': faculty,
             'section': section,
-          });
+          },
+        },
+      );
 
       if (response.status.hasError) {
         throw Exception('Failed to update faculty load');
@@ -130,6 +139,49 @@ class FacultyLoadController extends GetxController {
       }
     } catch (e) {
       Get.snackbar('Error', 'Failed to update faculty load: $e');
+    }
+  }
+
+  Future<void> fetchFacultyLoad(String id) async {
+    try {
+      final userId = await _storage.read('user_id');
+
+      if (userId == null) {
+        throw Exception('User ID not found. Please login again.');
+      }
+
+      final response = await _connect.post(
+        'http://localhost/autosched/backend_php/api/get_row.php?table_name=faculty_load',
+        {'user_id': userId, 'column_name': 'subject_id', 'value': id},
+      );
+
+      if (response.status.hasError) {
+        throw Exception('Failed to fetch faculty load data');
+      }
+
+      if (response.body['status'] == 'success') {
+        final data = response.body['data'];
+
+        facultyLoadData.clear();
+
+        for (var entry in data) {
+          facultyLoadData.add({
+            'id': entry['id']?.toString() ?? '',
+            'subject_id': entry['subject_id']?.toString() ?? '',
+            'faculty': entry['faculty']?.toString() ?? '',
+            'section': entry['section']?.toString() ?? '',
+          });
+        }
+
+        // You can now use facultyLoadData in your UI or for further processing
+        log('Faculty Load Data: $facultyLoadData');
+      } else {
+        throw Exception(
+          'Failed to fetch faculty load data: ${response.body['message']}',
+        );
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch faculty load data: $e');
     }
   }
 }

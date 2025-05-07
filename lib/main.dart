@@ -21,7 +21,6 @@ import 'package:autosched/screens/setup_manager_screen/rooms/room/room_list.dart
 import 'package:autosched/screens/setup_manager_screen/subject/add_subject/add_subject.dart';
 import 'package:autosched/screens/setup_manager_screen/subject/subject_list/subjects_list.dart';
 import 'package:autosched/screens/setup_manager_screen/subject/viewsubject.dart';
-import 'package:autosched/screens/teaching_load_screen/assign_faculty_load/assign_faculty_load.dart';
 import 'package:autosched/screens/teaching_load_screen/create_teaching/create_teaching_load.dart';
 import 'package:autosched/screens/teaching_load_screen/generate_load.dart';
 import 'package:autosched/screens/teaching_load_screen/teaching_load_list/teaching_load.dart';
@@ -55,7 +54,7 @@ class MyApp extends StatelessWidget {
         '/curriculum': (context) => const CurriculumScreen(),
         '/teaching-load': (context) => const TeachingLoadScreen(),
         '/create_teaching-load': (context) => CreateTeachingLoadScreen(),
-        '/assign-faculty-load': (context) => AssignFacultyLoadScreen(),
+        // '/assign-faculty-load': (context) => AssignFacultyLoadScreen(),
         // '/view-faculty': (context) => ViewFacultyScreen(),
         '/setup-manager/faculty':
             (context) => FacultyScreen(

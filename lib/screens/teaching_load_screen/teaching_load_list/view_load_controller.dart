@@ -65,4 +65,62 @@ class ViewLoadController extends GetxController {
   void refreshTeachingLoads() {
     fetchTeachingLoads();
   }
+
+  Future<void> deleteTeachingLoad(String id) async {
+    _isLoading.value = true;
+    _errorMessage.value = '';
+
+    try {
+      final response = await _connect.post(
+        'http://localhost/autosched/backend_php/api/delete_row.php',
+        {
+          'table': 'teaching_load_list',
+          'column_name': 'teaching_load_id',
+          'value': id,
+        },
+      );
+
+      if (response.status.hasError) {
+        throw Exception('Failed to delete teaching load');
+      }
+
+      final body = response.body;
+      if (body['status'] == 'success') {
+        // Remove the deleted item from the local list
+        _teachingLoads.removeWhere(
+          (load) => load['teaching_load_id'].toString() == id,
+        );
+        Get.snackbar(
+          'Success',
+          'Teaching load deleted successfully',
+          snackPosition: SnackPosition.TOP,
+        );
+      } else {
+        throw Exception(body['message'] ?? 'Unknown error occurred');
+      }
+    } catch (e) {
+      _errorMessage.value = 'An error occurred while deleting: $e';
+      Get.snackbar('Error', _errorMessage.value);
+    } finally {
+      _isLoading.value = false;
+    }
+  }
+
+  Future<void> deleteMultipleTeachingLoads(List<String> ids) async {
+    _isLoading.value = true;
+    _errorMessage.value = '';
+
+    try {
+      for (var id in ids) {
+        await deleteTeachingLoad(id);
+      }
+      Get.snackbar('Success', 'Selected teaching loads deleted successfully');
+    } catch (e) {
+      _errorMessage.value =
+          'An error occurred while deleting multiple items: $e';
+      Get.snackbar('Error', _errorMessage.value);
+    } finally {
+      _isLoading.value = false;
+    }
+  }
 }

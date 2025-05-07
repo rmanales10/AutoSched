@@ -84,6 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       label: 'Email or Phone',
                       obscureText: false,
                       controller: _emailController,
+                      onSubmit: _handleLogin,
                     ),
                     const SizedBox(height: 15),
                     _buildTextField(
@@ -95,6 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         });
                       },
                       controller: _passwordController,
+                      onSubmit: _handleLogin,
                     ),
 
                     const SizedBox(height: 15),
@@ -109,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 15),
 
-                    GestureDetector(
+                    InkWell(
                       onTap: () => _handleLogin(),
                       child: Container(
                         width: 350,
@@ -163,11 +165,21 @@ class _LoginScreenState extends State<LoginScreen> {
     required bool obscureText,
     VoidCallback? onToggle,
     TextEditingController? controller,
+    VoidCallback? onSubmit,
   }) {
     return TextField(
       cursorColor: Colors.grey,
       controller: controller,
       obscureText: obscureText,
+      textInputAction:
+          label.contains('Password')
+              ? TextInputAction.done
+              : TextInputAction.next,
+      onSubmitted: (value) {
+        if (label.contains('Password') && onSubmit != null) {
+          onSubmit();
+        }
+      },
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(horizontal: 20),
         labelText: label,

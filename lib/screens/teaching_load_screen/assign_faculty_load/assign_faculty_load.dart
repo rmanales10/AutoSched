@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AssignFacultyLoadScreen extends StatefulWidget {
-  const AssignFacultyLoadScreen({super.key});
+  final String id;
+  const AssignFacultyLoadScreen({super.key, required this.id});
 
   @override
   _AssignFacultyLoadScreenState createState() =>
@@ -21,8 +22,13 @@ class _AssignFacultyLoadScreenState extends State<AssignFacultyLoadScreen> {
   @override
   void initState() {
     super.initState();
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
     _controller.fetchLoad();
     _controller.fetchFaculty();
+    _controller.fetchFacultyLoad(widget.id);
   }
 
   @override
@@ -214,10 +220,18 @@ class _AssignFacultyLoadScreenState extends State<AssignFacultyLoadScreen> {
           _controller.facultyList.isNotEmpty
               ? _controller.facultyList
               : ['No faculty available'];
-      String? initialFaculty =
-          _controller.loadData.isNotEmpty && _controller.loadData.length > index
-              ? _controller.loadData[index][5]
-              : null;
+
+      String? initialFaculty;
+      if (_controller.loadData.isNotEmpty &&
+          _controller.loadData.length > index) {
+        String subjectId = _controller.loadId[index - 1][0];
+        var facultyLoadEntry = _controller.facultyLoadData.firstWhere(
+          (entry) => entry['subject_id'] == subjectId,
+          orElse: () => <String, dynamic>{},
+        );
+        initialFaculty = facultyLoadEntry['faculty'];
+      }
+
       String? displayValue =
           initialFaculty?.isNotEmpty == true
               ? initialFaculty
@@ -243,10 +257,18 @@ class _AssignFacultyLoadScreenState extends State<AssignFacultyLoadScreen> {
           _controller.sectionList.isNotEmpty
               ? _controller.sectionList
               : ['No sections available'];
-      String? initialSection =
-          _controller.loadData.isNotEmpty && _controller.loadData.length > index
-              ? _controller.loadData[index][6]
-              : null;
+
+      String? initialSection;
+      if (_controller.loadData.isNotEmpty &&
+          _controller.loadData.length > index) {
+        String subjectId = _controller.loadId[index - 1][0];
+        var facultyLoadEntry = _controller.facultyLoadData.firstWhere(
+          (entry) => entry['subject_id'] == subjectId,
+          orElse: () => <String, dynamic>{},
+        );
+        initialSection = facultyLoadEntry['section'];
+      }
+
       String? displayValue =
           initialSection?.isNotEmpty == true
               ? initialSection
@@ -323,16 +345,39 @@ class _AssignFacultyLoadScreenState extends State<AssignFacultyLoadScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 70),
-            child: _rowText("Total Units:", true),
-          ),
-          _rowText("12.0", true),
-          _rowText("7.0", true),
-          Padding(
-            padding: const EdgeInsets.only(right: 40),
-            child: _rowText("21.0", true),
-          ),
+          Obx(() {
+            double totalLec = 0.0;
+            double totalLab = 0.0;
+            double totalCredit = 0.0;
+
+            if (_controller.loadData.isNotEmpty &&
+                _controller.loadData.length > 1) {
+              for (int i = 1; i < _controller.loadData.length; i++) {
+                totalLec += double.tryParse(_controller.loadData[i][2]) ?? 0.0;
+                totalLab += double.tryParse(_controller.loadData[i][3]) ?? 0.0;
+                totalCredit +=
+                    double.tryParse(_controller.loadData[i][4]) ?? 0.0;
+              }
+            }
+
+            return Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 70),
+                  child: _rowText("Total Units:", true),
+                ),
+                SizedBox(width: 20),
+                _rowText(totalLec.toStringAsFixed(1), true),
+                SizedBox(width: 20),
+                _rowText(totalLab.toStringAsFixed(1), true),
+                SizedBox(width: 20),
+                Padding(
+                  padding: const EdgeInsets.only(right: 40),
+                  child: _rowText(totalCredit.toStringAsFixed(1), true),
+                ),
+              ],
+            );
+          }),
         ],
       ),
     );
@@ -425,10 +470,6 @@ class _AssignFacultyLoadScreenState extends State<AssignFacultyLoadScreen> {
                         await _updateFacultyLoad();
                         // You might want to show a success message or refresh the data here
                         _controller.fetchLoad(); // Refresh the data
-                        Get.snackbar(
-                          'Success',
-                          'Faculty load updated successfully',
-                        );
                       },
                       child: Container(
                         width: 120,
