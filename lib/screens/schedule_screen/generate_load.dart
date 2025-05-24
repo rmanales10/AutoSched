@@ -1,8 +1,18 @@
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 
-class GenerateLoadScreen extends StatelessWidget {
+class GenerateLoadScreen extends StatefulWidget {
   const GenerateLoadScreen({super.key});
+
+  @override
+  State<GenerateLoadScreen> createState() => _GenerateLoadScreenState();
+}
+
+class _GenerateLoadScreenState extends State<GenerateLoadScreen> {
+  String selectedSemester = 'First Semester';
+  String selectedAcademicYear = '2023-2024';
+  bool includePreferences = true;
+  bool optimizeConflicts = true;
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +55,52 @@ class GenerateLoadScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      const SizedBox(height: 40),
+                      _buildSection('Schedule Parameters', [
+                        _buildDropdown(
+                          'Semester',
+                          selectedSemester,
+                          ['First Semester', 'Second Semester', 'Summer'],
+                          (value) {
+                            setState(() {
+                              selectedSemester = value!;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        _buildDropdown(
+                          'Academic Year',
+                          selectedAcademicYear,
+                          ['2023-2024', '2024-2025', '2025-2026'],
+                          (value) {
+                            setState(() {
+                              selectedAcademicYear = value!;
+                            });
+                          },
+                        ),
+                      ]),
+                      const SizedBox(height: 30),
+                      _buildSection('Generation Options', [
+                        _buildSwitch(
+                          'Include Faculty Preferences',
+                          includePreferences,
+                          (value) {
+                            setState(() {
+                              includePreferences = value;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 15),
+                        _buildSwitch(
+                          'Optimize for Conflicts',
+                          optimizeConflicts,
+                          (value) {
+                            setState(() {
+                              optimizeConflicts = value;
+                            });
+                          },
+                        ),
+                      ]),
                       const Spacer(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -68,7 +124,9 @@ class GenerateLoadScreen extends StatelessWidget {
                             "Cancel",
                             Color.fromARGB(255, 243, 20, 4),
                             Colors.white,
-                            () {},
+                            () {
+                              Navigator.pop(context);
+                            },
                           ),
                         ],
                       ),
@@ -80,6 +138,80 @@ class GenerateLoadScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSection(String title, List<Widget> children) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF010042),
+          ),
+        ),
+        const SizedBox(height: 20),
+        ...children,
+      ],
+    );
+  }
+
+  Widget _buildDropdown(
+    String label,
+    String value,
+    List<String> items,
+    Function(String?) onChanged,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade400),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: value,
+              isExpanded: true,
+              items:
+                  items.map((String item) {
+                    return DropdownMenuItem<String>(
+                      value: item,
+                      child: Text(item),
+                    );
+                  }).toList(),
+              onChanged: onChanged,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSwitch(String label, bool value, Function(bool) onChanged) {
+    return Row(
+      children: [
+        Switch(
+          value: value,
+          onChanged: onChanged,
+          activeColor: const Color(0xFF010042),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        ),
+      ],
     );
   }
 }

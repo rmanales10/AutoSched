@@ -1,5 +1,7 @@
+import 'package:autosched/screens/curriculum_screen/curriculum_load/curriculum_load_controller.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class CurriculumLoadScreen extends StatefulWidget {
   const CurriculumLoadScreen({super.key});
@@ -9,46 +11,13 @@ class CurriculumLoadScreen extends StatefulWidget {
 }
 
 class _CurriculumLoadScreenState extends State<CurriculumLoadScreen> {
+  final _controller = Get.put(CurriculumLoadController());
   List<bool> isExpandedList = List.generate(8, (index) => false);
-  final List<List<Map<String, String>>> semesterSubjects = [
-    // 1st Year - 1st Semester
-    [
-      {
-        "id": "002",
-        "code": "IT112",
-        "title": "Computer Programming 1",
-        "lec": "2.0",
-        "lab": "1.0",
-        "credit": "3.0",
-      },
-      {
-        "id": "002",
-        "code": "IT112",
-        "title": "Computer Programming 1",
-        "lec": "2.0",
-        "lab": "1.0",
-        "credit": "3.0",
-      },
-      {
-        "id": "002",
-        "code": "IT112",
-        "title": "Computer Programming 1",
-        "lec": "2.0",
-        "lab": "1.0",
-        "credit": "3.0",
-      },
-      {
-        "id": "002",
-        "code": "IT112",
-        "title": "Computer Programming 1",
-        "lec": "2.0",
-        "lab": "1.0",
-        "credit": "3.0",
-      },
-    ],
-    // Other semesters (empty for now)
-    [], [], [], [], [], [], [],
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _controller.fetchSubjects();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +49,18 @@ class _CurriculumLoadScreenState extends State<CurriculumLoadScreen> {
                     ),
                   ),
                   const SizedBox(height: 30),
-                  _buildSemesterList(),
+                  Obx(() {
+                    // if (_controller.isLoading.value) {
+                    //   return Center(child: CircularProgressIndicator());
+                    // } else
+                    if (_controller.errorMessage.isNotEmpty) {
+                      return Center(
+                        child: Text(_controller.errorMessage.value),
+                      );
+                    } else {
+                      return _buildSemesterList();
+                    }
+                  }),
                 ],
               ),
             ),
@@ -88,6 +68,13 @@ class _CurriculumLoadScreenState extends State<CurriculumLoadScreen> {
         ],
       ),
     );
+  }
+
+  String getSemesterString(int index) {
+    List<String> years = ['1ST', '2ND', '3RD', '4TH'];
+    String year = years[index ~/ 2];
+    String semester = (index % 2 == 0) ? '1ST SEMESTER' : '2ND SEMESTER';
+    return '$year YEAR - $semester';
   }
 
   Widget _buildSemesterList() {
@@ -159,9 +146,30 @@ class _CurriculumLoadScreenState extends State<CurriculumLoadScreen> {
                 // Subject List (shown when expanded)
                 if (isExpandedList[index]) ...[
                   _buildSubjectHeader(),
-                  ...semesterSubjects[index].map(
-                    (subject) => _buildSubjectRow(subject),
-                  ),
+                  ..._controller.subjects
+                      .where((subject) {
+                        String semesterString = getSemesterString(index);
+                        List<String> parts = semesterString.split(' - ');
+                        String yearLevel = parts[0];
+                        String semester = parts[1];
+
+                        print('Semester String: $semesterString');
+                        print('Year Level: $yearLevel');
+                        print('Semester: $semester');
+                        print('Subject Year Level: ${subject['year_level']}');
+                        print('Subject Semester: ${subject['semester']}');
+
+                        bool matches =
+                            subject['year_level'].toString().toUpperCase() ==
+                                yearLevel &&
+                            subject['semester'].toString().toUpperCase() ==
+                                semester;
+
+                        print('Matches: $matches');
+
+                        return matches;
+                      })
+                      .map((subject) => _buildSubjectRow(subject)),
                 ],
               ],
             );
@@ -233,7 +241,7 @@ class _CurriculumLoadScreenState extends State<CurriculumLoadScreen> {
     );
   }
 
-  Widget _buildSubjectRow(Map<String, String> subject) {
+  Widget _buildSubjectRow(Map<String, dynamic> subject) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       decoration: BoxDecoration(
@@ -243,27 +251,45 @@ class _CurriculumLoadScreenState extends State<CurriculumLoadScreen> {
         children: [
           Expanded(
             flex: 1,
-            child: Text(subject["id"] ?? "", textAlign: TextAlign.center),
+            child: Text(
+              subject["id"]?.toString() ?? "",
+              textAlign: TextAlign.center,
+            ),
           ),
           Expanded(
             flex: 2,
-            child: Text(subject["code"] ?? "", textAlign: TextAlign.center),
+            child: Text(
+              subject["subject_code"] ?? "",
+              textAlign: TextAlign.center,
+            ),
           ),
           Expanded(
             flex: 4,
-            child: Text(subject["title"] ?? "", textAlign: TextAlign.center),
+            child: Text(
+              subject["descriptive_title"] ?? "",
+              textAlign: TextAlign.center,
+            ),
           ),
           Expanded(
             flex: 1,
-            child: Text(subject["lec"] ?? "", textAlign: TextAlign.center),
+            child: Text(
+              subject["lec"]?.toString() ?? "",
+              textAlign: TextAlign.center,
+            ),
           ),
           Expanded(
             flex: 1,
-            child: Text(subject["lab"] ?? "", textAlign: TextAlign.center),
+            child: Text(
+              subject["lab"]?.toString() ?? "",
+              textAlign: TextAlign.center,
+            ),
           ),
           Expanded(
             flex: 1,
-            child: Text(subject["credit"] ?? "", textAlign: TextAlign.center),
+            child: Text(
+              subject["credit"]?.toString() ?? "",
+              textAlign: TextAlign.center,
+            ),
           ),
         ],
       ),

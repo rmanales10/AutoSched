@@ -2,6 +2,7 @@ import 'package:autosched/screens/profile_screen/profile/profile_controller.dart
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:convert';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -62,10 +63,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 50),
                     Row(
                       children: [
-                        const CircleAvatar(
-                          radius: 60,
-                          backgroundImage: AssetImage('assets/profile.png'),
-                        ),
+                        Obx(() {
+                          final user = _controller.currentUser;
+                          final hasProfileImage =
+                              user['profile_image'] != null &&
+                              user['profile_image'].toString().contains(
+                                'base64,',
+                              );
+
+                          return CircleAvatar(
+                            radius: 60,
+                            backgroundColor: Colors.grey[300],
+                            backgroundImage:
+                                hasProfileImage
+                                    ? MemoryImage(
+                                      base64Decode(
+                                        user['profile_image'].toString().split(
+                                          'base64,',
+                                        )[1],
+                                      ),
+                                    )
+                                    : null,
+                            child:
+                                !hasProfileImage
+                                    ? Icon(
+                                      Icons.person,
+                                      size: 60,
+                                      color: Colors.grey[600],
+                                    )
+                                    : null,
+                          );
+                        }),
                         const SizedBox(width: 30),
                         Transform.translate(
                           offset: const Offset(0, 20),

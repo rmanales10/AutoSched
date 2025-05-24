@@ -1,0 +1,47 @@
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+
+class CurriculumLoadController extends GetxController {
+  final _connect = GetConnect();
+  final _storage = GetStorage();
+
+  final RxList<Map<String, dynamic>> subjects = <Map<String, dynamic>>[].obs;
+  final RxBool isLoading = false.obs;
+  final RxString errorMessage = ''.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchSubjects();
+  }
+
+  Future<void> fetchSubjects() async {
+    isLoading(true);
+    errorMessage('');
+
+    try {
+      final userId = await _storage.read('user_id');
+      final response = await _connect.post(
+        'http://localhost/autosched/backend_php/api/get_row.php?table_name=subjects',
+        {'user_id': userId},
+      );
+
+      if (response.status.hasError) {
+        errorMessage('Failed to fetch subjects. Please try again.');
+      } else {
+        final responseBody = response.body;
+        if (responseBody['status'] == 'success') {
+          subjects.assignAll(
+            List<Map<String, dynamic>>.from(responseBody['data']),
+          );
+        } else {
+          errorMessage(responseBody['message'] ?? 'Unknown error occurred');
+        }
+      }
+    } catch (e) {
+      errorMessage('An error occurred: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+}

@@ -3,6 +3,10 @@ import 'package:autosched/screens/profile_screen/profile/profile.dart';
 import 'package:autosched/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'dart:convert';
+import 'dart:typed_data';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -14,6 +18,8 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   String selectedRole = 'SCHEDULER';
+  File? _selectedImage;
+  Uint8List? _selectedImageBytes;
 
   final _editProfilecontroller = Get.put(EditProfileController());
   final _usernameController = TextEditingController();
@@ -22,6 +28,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _mobileNumberController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _picker = ImagePicker();
+
+  Future<void> _pickImage() async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery,
+      );
+      if (pickedFile != null) {
+        final bytes = await pickedFile.readAsBytes();
+        setState(() {
+          _selectedImageBytes = bytes;
+          _selectedImage = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      print('Error picking image: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,9 +91,66 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                       Row(
                         children: [
-                          const CircleAvatar(
-                            radius: 60,
-                            backgroundImage: AssetImage('assets/profile.png'),
+                          Stack(
+                            children: [
+                              CircleAvatar(
+                                radius: 60,
+                                backgroundColor: Colors.grey[300],
+                                backgroundImage:
+                                    _selectedImageBytes != null
+                                        ? MemoryImage(_selectedImageBytes!)
+                                        : _editProfilecontroller
+                                                    .currentUser['profile_image'] !=
+                                                null &&
+                                            _editProfilecontroller
+                                                .currentUser['profile_image']
+                                                .toString()
+                                                .contains('base64,')
+                                        ? MemoryImage(
+                                          base64Decode(
+                                            _editProfilecontroller
+                                                .currentUser['profile_image']
+                                                .toString()
+                                                .split('base64,')[1],
+                                          ),
+                                        )
+                                        : null,
+                                child:
+                                    _selectedImageBytes == null &&
+                                            (_editProfilecontroller
+                                                        .currentUser['profile_image'] ==
+                                                    null ||
+                                                !_editProfilecontroller
+                                                    .currentUser['profile_image']
+                                                    .toString()
+                                                    .contains('base64,'))
+                                        ? Icon(
+                                          Icons.person,
+                                          size: 60,
+                                          color: Colors.grey[600],
+                                        )
+                                        : null,
+                              ),
+                              Positioned(
+                                right: 0,
+                                bottom: 0,
+                                child: GestureDetector(
+                                  onTap: _pickImage,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF010042),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.attach_file,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(width: 20),
                           Obx(
@@ -419,6 +500,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       lastName: _lastNameController.text,
       mobileNumber: _mobileNumberController.text,
       password: _confirmPasswordController.text,
+      profileImage:
+          _selectedImageBytes != null
+              ? base64Encode(_selectedImageBytes!)
+              : null,
     );
     if (_editProfilecontroller.isSuccess) {
       // Update the controllers with the new values

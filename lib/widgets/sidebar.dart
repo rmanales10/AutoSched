@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get_rx/get_rx.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:autosched/screens/profile_screen/profile/profile_controller.dart';
+import 'package:get/get.dart';
+import 'dart:convert';
 
 class Sidebar extends StatefulWidget {
   final String selectedItem;
@@ -24,6 +27,31 @@ class _SidebarState extends State<Sidebar> {
   bool isSchedulerExpanded = false;
   RxString accessRole = ''.obs;
   final _storage = GetStorage();
+  final profileController = Get.put(ProfileController());
+
+  // Store profile data
+  late Rx<Map<String, dynamic>> userData;
+  late RxBool hasProfileImage;
+  late Rx<String?> profileImage;
+
+  @override
+  void initState() {
+    super.initState();
+    userData = Rx<Map<String, dynamic>>({});
+    hasProfileImage = false.obs;
+    profileImage = Rx<String?>(null);
+
+    // Fetch data once
+    final user = profileController.currentUser;
+    userData.value = user;
+
+    final image = user['profile_image'];
+    profileImage.value = image;
+    hasProfileImage.value =
+        image != null &&
+        image.toString().isNotEmpty &&
+        image.toString().contains('base64,');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -524,19 +552,47 @@ class _SidebarState extends State<Sidebar> {
   }
 
   Widget _buildProfileRow(double fontSize, double screenWidth) {
-    return Row(
-      children: [
-        CircleAvatar(
-          radius: screenWidth < 600 ? 30 : 40,
-          backgroundImage: const AssetImage('assets/profile.png'),
-        ),
-        const SizedBox(width: 20),
-        Text(
-          'SCHED',
-          style: TextStyle(fontSize: fontSize + 2, fontWeight: FontWeight.bold),
-        ),
-      ],
-    );
+    return Obx(() {
+      final user = profileController.currentUser;
+      final image = user['profile_image'];
+      final hasImage =
+          image != null &&
+          image.toString().isNotEmpty &&
+          image.toString().contains('base64,');
+
+      return Row(
+        children: [
+          CircleAvatar(
+            radius: screenWidth < 600 ? 30 : 40,
+            backgroundColor: Colors.grey[300],
+            backgroundImage:
+                hasImage
+                    ? Image.memory(
+                      base64Decode(image.toString().split('base64,')[1]),
+                      gaplessPlayback: true,
+                      fit: BoxFit.cover,
+                    ).image
+                    : null,
+            child:
+                !hasImage
+                    ? Icon(
+                      Icons.person,
+                      size: screenWidth < 600 ? 30 : 40,
+                      color: Colors.grey[600],
+                    )
+                    : null,
+          ),
+          const SizedBox(width: 20),
+          Text(
+            user['access_role'] ?? 'SCHED',
+            style: TextStyle(
+              fontSize: fontSize + 2,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      );
+    });
   }
 
   Widget _buildLogo(double logoSize) {

@@ -64,7 +64,7 @@ class _CurriculumScreenState extends State<CurriculumScreen> {
                                 size: 50,
                               ),
                               onPressed: () {
-                                Navigator.pushNamed(context, '/');
+                                // Navigator.pushNamed(context, '/');
                               },
                             ),
                           ],

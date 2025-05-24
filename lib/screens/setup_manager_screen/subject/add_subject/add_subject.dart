@@ -24,10 +24,12 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
   final _creditController = TextEditingController();
   final subjectArea = ['IT', 'CS', 'Engineering'];
   final yearLevel = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
+  final semester = ['1st Semester', '2nd Semester'];
   final program = ['Full-Time', 'Part-Time'];
   final major = ['Computer Science', 'Information Technology', 'Engineering'];
   final mode = ['Online', 'On-site'];
   String? _selectedSubjectArea;
+  String? _selectedSemester;
   String? _selectedYearLevel;
   String? _selectedProgram;
   String? _selectedMajor;
@@ -162,6 +164,13 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
               fontSize,
               width,
               _selectedYearLevel,
+            ),
+            _buildDropdownField(
+              semester,
+              'Semester',
+              fontSize,
+              width,
+              _selectedSemester,
             ),
             _buildDropdownField(
               program,
@@ -420,6 +429,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
         _selectedSubjectArea == null ||
         _selectedProgram == null ||
         _selectedMajor == null ||
+        _selectedSemester == null ||
         _selectedMode == null) {
       Get.snackbar('Error', 'Please fill in all fields');
       return;
@@ -436,6 +446,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
         credit: int.parse(_creditController.text),
         subjectArea: _selectedSubjectArea!,
         yearLevel: _selectedYearLevel!,
+        semester: _selectedSemester!,
         program: _selectedProgram!,
         major: _selectedMajor!,
         mode: _selectedMode!,
@@ -455,6 +466,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
         _selectedProgram = null;
         _selectedMajor = null;
         _selectedMode = null;
+        _selectedSemester = null;
       });
       // ignore: use_build_context_synchronously
       Navigator.pushReplacementNamed(context, '/setup-manager/subjects');

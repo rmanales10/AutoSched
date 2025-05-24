@@ -49,7 +49,11 @@ if (!empty($data->user_id)) {
             $updates[] = "mobile_number = ?";
             $params[] = htmlspecialchars(strip_tags($data->mobile_number));
         }
-
+        if (!empty($data->profile_image)) {
+            $updates[] = "profile_image = ?";
+            // Don't strip tags for base64 image data
+            $params[] = $data->profile_image;
+        }
 
         if (!empty($updates)) {
             $sql = "UPDATE users SET " . implode(", ", $updates) . " WHERE user_id = ?";

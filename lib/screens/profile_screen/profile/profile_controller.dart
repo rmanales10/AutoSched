@@ -7,6 +7,7 @@ class ProfileController extends GetxController {
   final _isSuccess = false.obs;
   final _currentUser = Rx<Map<String, dynamic>>({});
   final _currentProfileUser = Rx<Map<String, dynamic>>({});
+  bool _hasFetchedData = false;
 
   String get errorMessage => _errorMessage.value;
   bool get isSuccess => _isSuccess.value;
@@ -19,10 +20,16 @@ class ProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    getCurrentUser();
+    if (!_hasFetchedData) {
+      getCurrentUser();
+    }
   }
 
   Future<void> getCurrentUser() async {
+    if (_hasFetchedData && _currentUser.value.isNotEmpty) {
+      return; // Return cached data if already fetched
+    }
+
     try {
       final userId = _storage.read('user_id');
       if (userId == null) {
@@ -34,7 +41,6 @@ class ProfileController extends GetxController {
         'http://localhost/autosched/backend_php/api/get_row.php?table_name=users',
         {'user_id': userId},
       );
-      // log(response.body);
 
       if (response.status.hasError) {
         _errorMessage.value = 'Server error occurred';
@@ -45,13 +51,10 @@ class ProfileController extends GetxController {
       if (data['status'] == 'success') {
         _currentUser.value = data['data'][0];
         _isSuccess.value = true;
-        // log('User logged in: ${response.body}');
+        _hasFetchedData = true; // Mark as fetched
       } else {
         _errorMessage.value = data['message'] ?? 'Failed to get current user';
       }
-
-      // Print debug information
-      // log('Debug info: ${data['debug']}');
     } catch (e) {
       _errorMessage.value = 'An error occurred: $e';
     }
@@ -60,6 +63,7 @@ class ProfileController extends GetxController {
   void logout() {
     _currentUser.value = {};
     _isSuccess.value = false;
+    _hasFetchedData = false; // Reset fetch flag on logout
     _storage.remove('user_id');
     Get.offAll(LoginScreen());
   }

@@ -112,7 +112,7 @@ class _CreateCurriculumScreenState extends State<CreateCurriculumScreen> {
         _buildDropdown("Program", ["BFPT", "BSIT"], (value) {
           setState(() => selectedProgram = value);
         }, selectedProgram),
-        _buildDropdown("Major", ["Software Engineering", "Capstone"], (value) {
+        _buildDropdown("Major", ["N/A"], (value) {
           setState(() => selectedMajor = value);
         }, selectedMajor),
       ],

@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'dart:io';
+import 'dart:convert';
 
 class EditProfileController extends GetxController {
   final _errorMessage = ''.obs;
@@ -64,6 +66,7 @@ class EditProfileController extends GetxController {
     required String lastName,
     required String mobileNumber,
     required String password,
+    String? profileImage,
   }) async {
     _isLoading.value = true;
     _errorMessage.value = '';
@@ -81,18 +84,17 @@ class EditProfileController extends GetxController {
         userData['user_id'] = userId;
       }
 
-      // log('Sending data: $userData'); // Log the data being sent
+      if (profileImage != null) {
+        userData['profile_image'] = 'data:image/jpeg;base64,$profileImage';
+      }
 
       final response = await _connect.post(
         'http://localhost/autosched/backend_php/api/user_profile.php',
         userData,
       );
 
-      // log('Response received: ${response.body}'); // Log the response
-
       if (response.status.hasError) {
         _errorMessage.value = 'Server error occurred';
-        // log('Error: ${response.statusText}'); // Log the error
         return;
       }
 
@@ -101,11 +103,9 @@ class EditProfileController extends GetxController {
         _currentUser.value = data['user'];
         _isSuccess.value = true;
         if (userId == null) {
-          // New user created
           _storage.write('user_id', data['user']['user_id']);
           Get.snackbar('Success', 'New profile created successfully');
         } else {
-          // Existing user updated
           Get.snackbar('Success', 'Profile updated successfully');
         }
       } else {
@@ -115,7 +115,6 @@ class EditProfileController extends GetxController {
       }
     } catch (e) {
       _errorMessage.value = 'An error occurred: $e';
-      // log('Exception: $e'); // Log the exception
       Get.snackbar('Error', _errorMessage.value);
     } finally {
       _isLoading.value = false;

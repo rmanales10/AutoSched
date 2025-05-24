@@ -4,7 +4,7 @@ import 'package:autosched/screens/auth_screens/register/register.dart';
 import 'package:autosched/screens/curriculum_screen/addsub.dart';
 import 'package:autosched/screens/curriculum_screen/create_curriculum/create_curriculum.dart';
 import 'package:autosched/screens/curriculum_screen/curriculum_list/curriculum_list.dart';
-import 'package:autosched/screens/curriculum_screen/curriculum_load.dart';
+import 'package:autosched/screens/curriculum_screen/curriculum_load/curriculum_load.dart';
 import 'package:autosched/screens/home_screen/home.dart';
 import 'package:autosched/screens/profile_screen/edit_profile/edit_profile.dart';
 import 'package:autosched/screens/profile_screen/profile/profile.dart';
@@ -22,7 +22,7 @@ import 'package:autosched/screens/setup_manager_screen/subject/add_subject/add_s
 import 'package:autosched/screens/setup_manager_screen/subject/subject_list/subjects_list.dart';
 import 'package:autosched/screens/setup_manager_screen/subject/viewsubject.dart';
 import 'package:autosched/screens/teaching_load_screen/create_teaching/create_teaching_load.dart';
-import 'package:autosched/screens/teaching_load_screen/generate_load.dart';
+import 'package:autosched/screens/schedule_screen/generate_load.dart';
 import 'package:autosched/screens/teaching_load_screen/teaching_load_list/teaching_load.dart';
 import 'package:autosched/screens/teaching_load_screen/view_teaching_load.dart';
 import 'package:flutter/material.dart';
